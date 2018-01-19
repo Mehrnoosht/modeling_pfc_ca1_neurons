@@ -1,6 +1,6 @@
 %% This script is for History dependent model 
 
-clear 
+clear variables
 close all
 clc 
 
