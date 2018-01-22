@@ -9,6 +9,11 @@ dependencies:
 - ripple_detection
 - replay_classification
 - spectral_connectivity
+- scikit-learn
+- statsmodels
+- patsy
+- time_rescale
+- matplotlib
 - jupyter
 - setuptools
 - "pytest >= 2.7.1"
