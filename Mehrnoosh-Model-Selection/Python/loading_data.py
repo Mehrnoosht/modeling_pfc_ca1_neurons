@@ -13,9 +13,8 @@ from loren_frank_data_processing import (get_interpolated_position_dataframe,
                                          make_tetrode_dataframe)
 from src.parameters import ANIMALS
 
-days = range(1, N_DAYS + 1)
-epoch_info = make_epochs_dataframe(ANIMALS, days)
 tetrode_info = make_tetrode_dataframe(ANIMALS)
+epoch_info = make_epochs_dataframe(ANIMALS)
 
 epoch_key = ('HPa', 6, 2)
 tetrode_key = ('HPa',6,2,5)
