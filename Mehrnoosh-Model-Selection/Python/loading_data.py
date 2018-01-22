@@ -43,10 +43,6 @@ y_pos = get_interpolated_position_dataframe(epoch_key, ANIMALS)['y_position']
 speed = get_interpolated_position_dataframe(epoch_key, ANIMALS)['speed']
 head_direction = get_interpolated_position_dataframe(epoch_key, ANIMALS)['head_direction']
 
-spike_position =  spike.assign(linear_pos = linear_position,
-                               x_position = x_pos,y_position = y_pos,speed=speed,
-                               head_direction=head_direction)
-
 linear_position = pd.DataFrame(linear_position)
 x_pos = pd.DataFrame(x_pos)
 y_pos = pd.DataFrame(y_pos)
