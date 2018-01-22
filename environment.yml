@@ -1,4 +1,4 @@
-name: modeling_pfc_ca1_neurons
+name: Jadhav-2016-Data-Analysis
 channels:
 - conda-forge
 - defaults
