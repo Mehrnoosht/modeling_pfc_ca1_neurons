@@ -22,7 +22,8 @@ from loren_frank_data_processing import (make_epochs_dataframe,
                                          make_tetrode_dataframe,
                                          make_neuron_dataframe,
                                          get_spike_indicator_dataframe,
-                                         get_interpolated_position_dataframe)
+                                         get_interpolated_position_dataframe,
+                                         get_LFP_dataframe)
 
 
 
