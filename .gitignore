@@ -100,3 +100,5 @@ ENV/
 *.mat
 *.csv
 *.fig
+.DS_Store
+.directory
