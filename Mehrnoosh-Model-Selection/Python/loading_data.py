@@ -13,12 +13,13 @@ from loren_frank_data_processing import (get_interpolated_position_dataframe,
                                          make_tetrode_dataframe)
 from src.parameters import ANIMALS
 
-tetrode_info = make_tetrode_dataframe(ANIMALS)
 epoch_info = make_epochs_dataframe(ANIMALS)
 
 epoch_key = ('HPa', 6, 2)
-tetrode_key = ('HPa',6,2,5)
-neuron_info = make_neuron_dataframe(ANIMALS)
+tetrode_info = make_tetrode_dataframe(ANIMALS).xs(epoch_key, drop_level=False)
+tetrode_key = ('HPa', 6, 2, 5)
+
+neuron_info = make_neuron_dataframe(ANIMALS).xs(epoch_key, drop_level=False)
 neuron_key = ('HPa', 6, 2, 5, 2)
 
 spike = get_spike_indicator_dataframe(neuron_key, ANIMALS)
