@@ -5,27 +5,13 @@ Created on Mon Jan 22 15:27:43 2018
 
 @author: Mehrnoosh
 """
-
-import numpy as np
-import pandas as pd
-import statsmodels.api as sm
-from sklearn.gaussian_process.kernels import (RBF, Matern, RationalQuadratic,
-ExpSineSquared, DotProduct,ConstantKernel)
-from patsy import dmatrix
-from time_rescale import TimeRescaling
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from src.parameters import ANIMALS
-from src.parameters import N_DAYS
-from loren_frank_data_processing import (make_epochs_dataframe,
-                                         make_tetrode_dataframe,
-                                         make_neuron_dataframe,
+from loren_frank_data_processing import (get_interpolated_position_dataframe,
+                                         get_LFP_dataframe,
                                          get_spike_indicator_dataframe,
-                                         get_interpolated_position_dataframe,
-                                         get_LFP_dataframe)
-
-
-
+                                         make_epochs_dataframe,
+                                         make_neuron_dataframe,
+                                         make_tetrode_dataframe)
+from src.parameters import ANIMALS
 
 days = range(1, N_DAYS + 1)
 epoch_info = make_epochs_dataframe(ANIMALS, days)
