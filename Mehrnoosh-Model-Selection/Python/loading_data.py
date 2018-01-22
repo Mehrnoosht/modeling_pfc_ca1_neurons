@@ -23,19 +23,14 @@ neuron_info = make_neuron_dataframe(ANIMALS)
 neuron_key = ('HPa', 6, 2, 5, 2)
 
 spike = get_spike_indicator_dataframe(neuron_key, ANIMALS)
-x_pos =  get_interpolated_position_dataframe(epoch_key, ANIMALS)['x_position']
-y_pos = get_interpolated_position_dataframe(epoch_key, ANIMALS)['y_position']
-speed = get_interpolated_position_dataframe(epoch_key, ANIMALS)['speed']
-head_direction = get_interpolated_position_dataframe(epoch_key, ANIMALS)['head_direction']
-
-linear_position = pd.DataFrame(linear_position)
-x_pos = pd.DataFrame(x_pos)
-y_pos = pd.DataFrame(y_pos)
-eeg = get_LFP_dataframe(tetrode_key,ANIMALS )
-
-
-linear_position.to_csv('linear_position.csv', sep=',')
+position_info = get_interpolated_position_dataframe(epoch_key, ANIMALS)
 linear_distance = position_info['linear_distance']
+x_pos = position_info['x_position']
+y_pos = position_info['y_position']
+speed = position_info['speed']
+head_direction = position_info['head_direction']
+eeg = get_LFP_dataframe(tetrode_key, ANIMALS)
+
 linear_distance.to_csv('linear_distance.csv', sep=',')
 spike.to_csv('spike.csv', sep=',')
 x_pos.to_csv('x_position.csv', sep=',')
