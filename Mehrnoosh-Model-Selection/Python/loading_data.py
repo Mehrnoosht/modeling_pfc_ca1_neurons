@@ -5,13 +5,14 @@ Created on Mon Jan 22 15:27:43 2018
 
 @author: Mehrnoosh
 """
-from loren_frank_data_processing import (get_interpolated_position_dataframe,
-                                         get_LFP_dataframe,
-                                         get_spike_indicator_dataframe,
-                                         make_epochs_dataframe,
-                                         make_neuron_dataframe,
-                                         make_tetrode_dataframe)
+
 from src.parameters import ANIMALS
+from loren_frank_data_processing import (make_epochs_dataframe,
+                                         make_tetrode_dataframe,
+                                         make_neuron_dataframe,
+                                         get_spike_indicator_dataframe,
+                                         get_interpolated_position_dataframe,
+                                         get_LFP_dataframe)
 
 epoch_info = make_epochs_dataframe(ANIMALS)
 
