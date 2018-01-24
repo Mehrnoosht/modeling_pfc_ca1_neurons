@@ -102,3 +102,8 @@ ENV/
 *.fig
 .DS_Store
 .directory
+
+# Matlab
+*.asv
+*.m~
+*.mex*
