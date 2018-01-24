@@ -5,7 +5,7 @@ clc
 %% Loading data
 
 eeg = csvread('Data/eeg.csv');
-data_pos = csvread('Data/linear_position.csv');
+data_pos = csvread('Data/linear_distance.csv');
 data_spike = csvread('Data/spike.csv');
 data_dir = csvread('Data/direction.csv');
 timee = data_pos(:,1);
