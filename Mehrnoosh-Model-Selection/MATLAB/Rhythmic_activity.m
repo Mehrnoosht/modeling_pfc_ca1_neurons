@@ -3,17 +3,14 @@ clear
 close all
 clc
 %% Loading data
-
+% 
+% lfp = load('Data/eeg.mat');
+% timee = load('Data/time.mat');
+% lfp = lfp.struct.electric_potential;
+% timee = timee.struct.time;
 eeg = csvread('Data/eeg.csv');
-data_pos = csvread('Data/linear_distance.csv');
-data_spike = csvread('Data/spike.csv');
-data_dir = csvread('Data/direction.csv');
-timee = data_pos(:,1);
-lin_pos = data_pos(:,2);
-direction = data_dir(:,2);
-spike = data_spike(:,2);
-lfp =eeg;
-
+timee = eeg(:,1);
+lfp = eeg(:,2);
 
 
 %% Autocovariance

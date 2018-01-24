@@ -46,8 +46,11 @@ spike = pd.DataFrame(spike)
 spike_dict = {col_name : spike[col_name].values for col_name in spike.columns.values}
 scipy.io.savemat('spike.mat', {'struct':spike_dict})
 
-time = spike.index
+time = spike.index.total_seconds()
 time = pd.DataFrame(time)
+#timee['time'] = timee['time'].map(lambda x: str(x)[7:])
+#x = time.strptime('00:04:23'.split(',')[0],'%H:%M:%S')
+
 time_dict = {col_name : time[col_name].values for col_name in time.columns.values}
 scipy.io.savemat('time.mat', {'struct':time_dict})
 

@@ -27,9 +27,9 @@ rate = count./occupancy;
 
 T = length(time);
 lag = 200;
-Hist = [];
+Hist = zeros(length(spike)-lag,lag);
 for i=1:lag
-   Hist = [Hist spike(lag-i+1:end-i)];
+   Hist(:,i) = spike(lag-i+1:end-i);
 end
 
 y=spike(lag+1:end);
@@ -201,3 +201,6 @@ title('KS Plot for History dependent mdoel with direction')
 xlabel('Model CDF')
 ylabel('Emperical CDF')
 
+%% 
+ 1-chi2cdf(dev_spl-dev_spl_pos,num_c_pts);
+ 
