@@ -8,11 +8,6 @@ Created on Mon Sep 18 17:33:21 2017
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-import seaborn as sns
-import statsmodels.api as sm
-from mpl_toolkits.mplot3d import Axes3D
-from scipy import signal as scis
 
 from src.data_processing import (get_interpolated_position_dataframe,
                                  get_LFP_dataframe,

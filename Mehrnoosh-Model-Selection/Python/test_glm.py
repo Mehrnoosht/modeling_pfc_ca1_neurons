@@ -10,8 +10,6 @@ import numpy as np
 import pandas as pd
 import scipy.io as load
 import statsmodels.api as sm
-import statsmodels.distributions as smf
-from mpl_toolkits.mplot3d import Axes3D
 
 data = load.loadmat('glm_data.mat')
 

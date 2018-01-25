@@ -12,11 +12,6 @@ import numpy as np
 import pandas as pd
 import scipy
 import statsmodels.api as sm
-from mpl_toolkits.mplot3d import Axes3D
-from patsy import dmatrix
-from sklearn.gaussian_process.kernels import (RBF, ConstantKernel, DotProduct,
-                                              ExpSineSquared, Matern,
-                                              RationalQuadratic)
 
 from src.data_processing import (get_interpolated_position_dataframe,
                                  get_spike_indicator_dataframe,

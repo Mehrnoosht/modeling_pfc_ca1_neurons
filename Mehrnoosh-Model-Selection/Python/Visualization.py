@@ -10,9 +10,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.signal as scis
-import statsmodels.api as sm
-from mpl_toolkits.mplot3d import Axes3D
-from scipy import signal as scis
 
 from src.data_processing import (get_interpolated_position_dataframe,
                                  get_LFP_dataframe,

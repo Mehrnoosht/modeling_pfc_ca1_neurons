@@ -8,11 +8,6 @@ Created on Mon Sep 18 13:57:48 2017
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-import seaborn as sns
-import statsmodels.api as sm
-from mpl_toolkits.mplot3d import Axes3D
-from scipy import signal
 
 from src.data_processing import (get_interpolated_position_dataframe,
                                  get_LFP_dataframe,
@@ -41,8 +36,9 @@ speed = get_interpolated_position_dataframe(epoch_key, ANIMALS)['speed']
 head_direction = get_interpolated_position_dataframe(epoch_key, ANIMALS)[
     'head_direction']
 
-spike_position = spike.assign(linear_pos=linear_position, x_position=x_pos,
-                              y_position=y_pos, speed=speed, head_direction=head_direction)
+spike_position = spike.assign(
+    linear_pos=linear_position, x_position=x_pos,
+    y_position=y_pos, speed=speed, head_direction=head_direction)
 spike_pos = spike_position[spike['is_spike'] == 1]
 
 

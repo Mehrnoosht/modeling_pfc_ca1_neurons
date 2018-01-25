@@ -11,19 +11,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from mpl_toolkits.mplot3d import Axes3D
 from patsy import dmatrix
-from sklearn.gaussian_process.kernels import (RBF, ConstantKernel, DotProduct,
-                                              ExpSineSquared, Matern,
-                                              RationalQuadratic)
 
 from loren_frank_data_processing import (get_interpolated_position_dataframe,
-                                         get_LFP_dataframe,
                                          get_spike_indicator_dataframe,
                                          make_epochs_dataframe,
                                          make_neuron_dataframe,
                                          make_tetrode_dataframe)
-from src.parameters import ANIMALS, N_DAYS
+from src.parameters import ANIMALS
 from time_rescale import TimeRescaling
 
 ########################## Loading Data #######################################

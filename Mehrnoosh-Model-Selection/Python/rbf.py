@@ -8,9 +8,6 @@ Created on Fri Oct 27 09:34:11 2017
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.gaussian_process.kernels import (RBF, ConstantKernel, DotProduct,
-                                              ExpSineSquared, Matern,
-                                              RationalQuadratic)
 
 x = np.linspace(-10, 10)[:, np.newaxis]
 mean = np.atleast_2d([7.5, -5.0])
