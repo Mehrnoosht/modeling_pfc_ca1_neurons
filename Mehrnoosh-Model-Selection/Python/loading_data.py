@@ -5,16 +5,16 @@ Created on Mon Jan 22 15:27:43 2018
 
 @author: Mehrnoosh
 """
-import scipy 
 import pandas as pd
-from src.parameters import ANIMALS
-from loren_frank_data_processing import (make_epochs_dataframe,
-                                         make_tetrode_dataframe,
-                                         make_neuron_dataframe,
-                                         get_spike_indicator_dataframe,
-                                         get_interpolated_position_dataframe,
-                                         get_LFP_dataframe)
+import scipy
 
+from loren_frank_data_processing import (get_interpolated_position_dataframe,
+                                         get_LFP_dataframe,
+                                         get_spike_indicator_dataframe,
+                                         make_epochs_dataframe,
+                                         make_neuron_dataframe,
+                                         make_tetrode_dataframe)
+from src.parameters import ANIMALS
 
 epoch_info = make_epochs_dataframe(ANIMALS)
 
@@ -35,28 +35,40 @@ head_direction = position_info['head_direction']
 eeg = get_LFP_dataframe(tetrode_key, ANIMALS)
 
 linear_distance = pd.DataFrame(linear_distance)
-pos_dict = {col_name : linear_distance[col_name].values for col_name in linear_distance.columns.values}
-scipy.io.savemat('linear_position.mat', {'struct':pos_dict})
+pos_dict = {
+    col_name: linear_distance[col_name].values
+    for col_name in linear_distance.columns.values}
+scipy.io.savemat('linear_position.mat', {'struct': pos_dict})
 
 eeg = pd.DataFrame(eeg)
-eeg_dict = {col_name : eeg[col_name].values for col_name in eeg.columns.values}
-scipy.io.savemat('eeg.mat', {'struct':eeg_dict})
+eeg_dict = {col_name: eeg[col_name].values for col_name in eeg.columns.values}
+scipy.io.savemat('eeg.mat', {'struct': eeg_dict})
 
+#<<<<<<< HEAD
 spike = spike.to_frame(name='is_spike')
 spike_dict = {col_name : spike[col_name].values for col_name in spike.columns.values}
 scipy.io.savemat('spike.mat', {'struct':spike_dict})
+#=======
+spike = pd.DataFrame(spike)
+spike_dict = {
+    col_name: spike[col_name].values for col_name in spike.columns.values}
+scipy.io.savemat('spike.mat', {'struct': spike_dict})
+#>>>>>>> 82e2dfb41ab05406ba45095f32431f02f717f538
 
 time = spike.index.total_seconds()
 time = pd.DataFrame(time)
 #timee['time'] = timee['time'].map(lambda x: str(x)[7:])
 #x = time.strptime('00:04:23'.split(',')[0],'%H:%M:%S')
 
-time_dict = {col_name : time[col_name].values for col_name in time.columns.values}
-scipy.io.savemat('time.mat', {'struct':time_dict})
+time_dict = {
+    col_name: time[col_name].values for col_name in time.columns.values}
+scipy.io.savemat('time.mat', {'struct': time_dict})
 
-head_direction = pd.DataFrame(head_direction )
-head_direction_dict = {col_name : head_direction [col_name].values for col_name in head_direction .columns.values}
-scipy.io.savemat('direction.mat', {'struct':head_direction_dict})
+head_direction = pd.DataFrame(head_direction)
+head_direction_dict = {
+    col_name: head_direction[col_name].values
+    for col_name in head_direction.columns.values}
+scipy.io.savemat('direction.mat', {'struct': head_direction_dict})
 
 '''
 linear_distance.to_csv('linear_distance.csv', sep=',')

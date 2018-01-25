@@ -5,9 +5,9 @@ from copy import deepcopy
 import numpy as np
 from scipy.special import expit
 from scipy.stats import norm
-from .utils import logger, set_log_level
-from .mixin import EstimatorMixin
 
+from .mixin import EstimatorMixin
+from .utils import logger, set_log_level
 
 
 def _lmb(distr, beta0, beta, X, eta):
@@ -91,7 +91,7 @@ def _L2penalty(beta, Tau):
     else:
         # Tikhonov penalty
         if (Tau.shape[0] != beta.shape[0] or
-           Tau.shape[1] != beta.shape[0]):
+                Tau.shape[1] != beta.shape[0]):
             raise ValueError('Tau should be (n_features x n_features)')
         else:
             L2penalty = np.linalg.norm(np.dot(Tau, beta), 2) ** 2
@@ -151,7 +151,7 @@ def _grad_L2loss(distr, alpha, Tau, reg_lambda, X, y, eta, beta):
     if distr in ['poisson', 'softplus']:
         grad_beta0 = np.sum(grad_mu) - np.sum(y * grad_mu / mu)
         grad_beta = ((np.dot(grad_mu.T, X) -
-                     np.dot((y * grad_mu / mu).T, X)).T)
+                      np.dot((y * grad_mu / mu).T, X)).T)
 
     elif distr == 'gaussian':
         grad_beta0 = np.sum((mu - y) * grad_mu)
