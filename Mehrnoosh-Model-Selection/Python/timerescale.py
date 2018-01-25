@@ -2,18 +2,21 @@
 # This script is psedu code for learning how to use time_rescaling library
 
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from patsy import dmatrix
 from statsmodels.api import GLM, families
+
 from time_rescale import TimeRescaling
+
 
 def simulate_poisson_process(rate, sampling_frequency):
     return np.random.poisson(rate / sampling_frequency)
 
+
 n_time, n_trials = 1500, 1000
 SAMPLING_FREQUENCY = 1500
-sampling_frequency = 1500;
+sampling_frequency = 1500
 
 # Firing rate starts at 5 Hz and switches to 10 Hz
 firing_rate = np.ones((n_time, n_trials)) * 10
@@ -23,7 +26,7 @@ spike_train = simulate_poisson_process(
 time = (np.arange(0, n_time)[:, np.newaxis] / sampling_frequency *
         np.ones((1, n_trials)))
 trial_id = (np.arange(n_trials)[np.newaxis, :]
-           * np.ones((n_time, 1)))
+            * np.ones((n_time, 1)))
 
 # Fit a spline model to the firing rate
 design_matrix = dmatrix('bs(time, df=5)', dict(time=time.ravel()))
@@ -60,11 +63,3 @@ rescaled = TimeRescaling(conditional_intensity,
 fig, axes = plt.subplots(1, 2, figsize=(12, 6))
 rescaled.plot_ks(ax=axes[0])
 rescaled.plot_rescaled_ISI_autocorrelation(ax=axes[1])
-
-
-
-
-
-
-
-
