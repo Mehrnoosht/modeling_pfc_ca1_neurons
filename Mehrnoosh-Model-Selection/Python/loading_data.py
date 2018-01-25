@@ -44,16 +44,10 @@ eeg = pd.DataFrame(eeg)
 eeg_dict = {col_name: eeg[col_name].values for col_name in eeg.columns.values}
 scipy.io.savemat('eeg.mat', {'struct': eeg_dict})
 
-#<<<<<<< HEAD
-spike = spike.to_frame(name='is_spike')
-spike_dict = {col_name : spike[col_name].values for col_name in spike.columns.values}
-scipy.io.savemat('spike.mat', {'struct':spike_dict})
-#=======
 spike = pd.DataFrame(spike)
 spike_dict = {
     col_name: spike[col_name].values for col_name in spike.columns.values}
 scipy.io.savemat('spike.mat', {'struct': spike_dict})
-#>>>>>>> 82e2dfb41ab05406ba45095f32431f02f717f538
 
 time = spike.index.total_seconds()
 time = pd.DataFrame(time)
