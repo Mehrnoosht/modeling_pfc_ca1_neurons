@@ -84,21 +84,6 @@ lambda_spl = yhat;
 %% Visualization
 
 figure;
-bar(bins,rate);
-hold on
-plot(lin_pos,lambda_reg,'Linewidth',2)
-hold on 
-plot(lin_pos,lambda_quad,'Linewidth',2)
-hold on 
-plot(lin_pos,lambda_rbf,'Linewidth',2)
-hold on
-plot(lin_pos,lambda_spl,'Linewidth',2)
-xlabel('linear Position[cm]')
-ylabel('Firing Rate')
-legend('occupancy normalized','linear regression','Quadratic Poly.','Gaussian-RBF','Spline')
-
-%% OR 
-figure;
 subplot(2,2,1)
 bar(bins,rate);
 hold on
