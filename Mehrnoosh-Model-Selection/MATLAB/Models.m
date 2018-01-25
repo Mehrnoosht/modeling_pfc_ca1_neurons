@@ -131,6 +131,8 @@ xlabel('linear Position[cm]')
 ylabel('Firing Rate[spike/ms]')
 title('Cardinal Spline GLM')
 
+saveas(gcf,[pwd '/Results/Firing_Rate_4models.fig']);
+saveas(gcf,[pwd '/Results/Firing_Rate_4models.png']);
 %% KS plot 
 
 % Linear Regreesion 
@@ -162,6 +164,8 @@ KS_spl =  KSplot(lambda_spl,spike);
 title('KS Plot for Cardinal Spline')
 xlabel('Model CDF')
 ylabel('Emperical CDF')
+saveas(gcf,[pwd '/Results/KS_Plot_4models.fig']);
+saveas(gcf,[pwd '/Results/KS_Plot_4models.png']);
 
 %% AIC model
 
@@ -211,6 +215,5 @@ xlabel('Time')
 ylabel('Residual')
 legend('Linear','Quadratic','Gaussian RBF','Cardinal Spline')
 grid
-savefig('Residual Analysis.fig')
 saveas(gcf,[pwd '/Results/Residual_Analysis.png']);
 saveas(gcf,[pwd '/Results/Residual_Analysis.fig']);
