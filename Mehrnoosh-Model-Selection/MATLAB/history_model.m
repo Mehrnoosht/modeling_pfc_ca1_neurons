@@ -6,13 +6,14 @@ clc
 
 %% Load data 
 
-data_pos = csvread('Data/linear_position.csv');
-data_spike = csvread('Data/spike.csv');
-data_dir = csvread('Data/direction.csv');
-time = data_pos(:,1);
-lin_pos = data_pos(:,2);
-direction = data_dir(:,2);
-spike = data_spike(:,2);
+lin_pos = load('Data/linear_position.mat');
+spike = load('Data/spike.mat');
+direction = load('Data/direction.mat');
+time = load('Data/time.mat');
+time = time.struct.time;
+lin_pos = lin_pos.struct.linear_distance;
+direction = direction.struct.head_direction;
+spike = spike.struct.is_spike;
 
 
 %% Emperical Model
@@ -63,23 +64,6 @@ X_hist_spl = Hist*X_spl;
 one = ones(length(y),1);
 X_spl_hist = [one X_hist_spl];
 lambda_spl = exp(X_spl_hist*b_spl);
-%% Gaussian RBf
-
-mu = linspace(0,100,10);
-design_matrix_rbf = [];
-n = length(mu);
-
-for i=1:n
-   mean = mu(i)*ones(lag,1); 
-   design_matrix_rbf(:,i) = gaussian_rbf(spike(1:lag),mean,140) ; 
-end
-
-X_rbf = Hist*design_matrix_rbf;
-[b_rbf,dev_rbf,stats_rbf] = glmfit(X_rbf,y,'poisson');
-
-one = ones(length(y),1);
-X = [one X_rbf];
-lambda_rbf = exp(X*b_rbf);
 
 %% KS plot
 
