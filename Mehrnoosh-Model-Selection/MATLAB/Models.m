@@ -211,4 +211,6 @@ xlabel('Time')
 ylabel('Residual')
 legend('Linear','Quadratic','Gaussian RBF','Cardinal Spline')
 grid
-
+savefig('Residual Analysis.fig')
+saveas(gcf,[pwd '/Results/Residual_Analysis.png']);
+saveas(gcf,[pwd '/Results/Residual_Analysis.fig']);
