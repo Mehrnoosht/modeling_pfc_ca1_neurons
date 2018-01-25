@@ -42,7 +42,7 @@ eeg = pd.DataFrame(eeg)
 eeg_dict = {col_name : eeg[col_name].values for col_name in eeg.columns.values}
 scipy.io.savemat('eeg.mat', {'struct':eeg_dict})
 
-spike = pd.DataFrame(spike)
+spike = spike.to_frame(name='is_spike')
 spike_dict = {col_name : spike[col_name].values for col_name in spike.columns.values}
 scipy.io.savemat('spike.mat', {'struct':spike_dict})
 

@@ -4,13 +4,13 @@ close all
 clc
 %% Loading data
 % 
-% lfp = load('Data/eeg.mat');
-% timee = load('Data/time.mat');
-% lfp = lfp.struct.electric_potential;
-% timee = timee.struct.time;
-eeg = csvread('Data/eeg.csv');
-timee = eeg(:,1);
-lfp = eeg(:,2);
+lfp = load('Data/eeg.mat');
+timee = load('Data/time.mat');
+lfp = lfp.struct.electric_potential;
+timee = timee.struct.time;
+% eeg = csvread('Data/eeg.csv');
+% timee = eeg(:,1);
+% lfp = eeg(:,2);
 
 
 %% Autocovariance

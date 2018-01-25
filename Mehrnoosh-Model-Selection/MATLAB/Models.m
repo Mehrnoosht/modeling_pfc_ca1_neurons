@@ -7,11 +7,17 @@ clc
 
 %% Load data 
 
-data_pos = csvread('linear_position.csv');
-data_spike = csvread('spike.csv');
-time = data_pos(:,1);
-lin_pos = data_pos(:,2);
-spike = data_spike(:,2);
+lin_pos = load('Data/linear_position.mat');
+spike = load('Data/spike.mat');
+time = load('Data/time.mat');
+time = time.struct.time;
+lin_pos = lin_pos.struct.linear_distance;
+lin_pos = lin_pos';
+spike = spike.struct.is_spike;
+
+lin_pos(isnan(lin_pos))=0;
+spike = double(spike');
+
 
 %% Emperical Model
 N = length(spike);
@@ -22,27 +28,28 @@ occupancy = hist(lin_pos,bins);
 rate = count./occupancy;
 %% Linear Regression
 
-design_matrix_reg = [lin_pos'];
+design_matrix_reg = [];
+design_matrix_reg = [lin_pos];
 [b_reg,dev_reg,stats_reg] = glmfit(design_matrix_reg,spike,'poisson');
 lambda_reg = exp(b_reg(1)+b_reg(2)*design_matrix_reg);
 
 %% GLM (Quadratic)
 
 design_matrix_quad = [];
-design_matrix_quad(:,1) = lin_pos';
-design_matrix_quad(:,2) =(lin_pos.^2)';
+design_matrix_quad(:,1) = lin_pos;
+design_matrix_quad(:,2) =(lin_pos.^2);
 [b_quad,dev_quad,stats_quad] = glmfit(design_matrix_quad,spike,'poisson');
 lambda_quad = exp(b_quad(1)+b_quad(2)*design_matrix_quad(:,1)+b_quad(3)*design_matrix_quad(:,2));
 
 %% GLM (RBF)
 
-mu = linspace(min(lin_pos),max(lin_pos),17);
+mu = linspace(min(lin_pos),max(lin_pos),20);
 design_matrix_rbf = [];
 n = length(mu);
 
 for i=1:n
    mean = mu(i)*ones(length(lin_pos),1); 
-   design_matrix_rbf(:,i) = gaussian_rbf(lin_pos,mean,140) ;
+   design_matrix_rbf(:,i) = gaussian_rbf(lin_pos,mean,160) ;
     
 end
 
@@ -54,7 +61,8 @@ lambda_rbf = exp(X*b_rbf);
 
 %% GLM (Spline)
 
-c_pt = [-210,-190,-150,-140,-120,-100,-90,-50,-20,0,20,40,60,80,120,150,200,220];
+%c_pt = [-210,-190,-150,-140,-120,-100,-90,-50,-20,0,20,40,60,80,120,150,200,220];
+c_pt = [-20,-10,0,10,15,20,30,50,60,70,80,90,100,110,130,140,150,170,190,200];
 num_c_pts = length(c_pt);
 s = 0.4; 
 X = zeros(length(lin_pos),length(c_pt));
@@ -90,6 +98,7 @@ ylabel('Firing Rate')
 legend('occupancy normalized','linear regression','Quadratic Poly.','Gaussian-RBF','Spline')
 
 %% OR 
+figure;
 subplot(2,2,1)
 bar(bins,rate);
 hold on
@@ -157,7 +166,7 @@ ylabel('Emperical CDF')
 %% AIC model
 
 % Linear Regression
-ll_reg = sum(log(poisspdf(spike,lambda_reg')));
+ll_reg = sum(log(poisspdf(spike,lambda_reg)));
 AIC_reg = -2*ll_reg+2*2;
 
 % Quadratic Poly. 
