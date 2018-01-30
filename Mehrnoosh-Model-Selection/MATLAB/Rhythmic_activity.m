@@ -24,6 +24,8 @@ figure;
 plot(lag*dt,ac);
 xlabel('Lag')
 ylabel('Autocovariance')
+saveas(gcf,[pwd '/Results/Autocovariance.fig']);
+saveas(gcf,[pwd '/Results/Autocovariance.png']);
 %% Spectrum Analysis
 
 ft = fft(lfp-mean(lfp));
@@ -32,7 +34,6 @@ Sxx = Sxx(1:length(lfp)/2+1);
 df = 1/max(T); %Frequancy resolution
 fnq = 1/dt/2; %Nyquist Freq. 
 f = (0:df:fnq);
-
 
 %% Visualization
 
@@ -60,6 +61,9 @@ semilogx(f,10*log10(Sxx/max(Sxx)));
 xlabel('Freq.[Hz]')
 ylabel('Power [dB]')
 title('Power Spectrum of EEG signal')
+
+saveas(gcf,[pwd '/Results/EEG_Signal.fig']);
+saveas(gcf,[pwd '/Results/EEG_signal.png']);
 %% Spectrogram
 
 sampling_freq = 1/dt;
@@ -76,6 +80,8 @@ axis xy;
 xlabel('Time[s]');
 ylabel('Freq.[HZ]');
 title('Spectrogram of EEG signal')
+saveas(gcf,[pwd '/Results/Spectogram.fig']);
+saveas(gcf,[pwd '/Results/Spectogram.png']);
 %% Filtered EEG
 
 n=1000; %Filter order
@@ -104,6 +110,9 @@ xlabel('Freq.[Hz]')
 ylabel('Power [dB]')
 title('Power Spectrum of low-pass filtered EEG signal')
 alpha(0.5)
+
+saveas(gcf,[pwd '/Results/Lowpass_filter_EEG.fig']);
+saveas(gcf,[pwd '/Results/Lowpass_filter_EEG.png']);
 %% Theta Rhythm
 
 Wn_th = [5, 8]/fnq;
@@ -148,3 +157,6 @@ subplot(2,2,4);
 envelope(amp,10000,'peak')
 xlabel('Time')
 ylabel('Theta Amplitute')
+
+saveas(gcf,[pwd '/Results/Theta_Rhythem.fig']);
+saveas(gcf,[pwd '/Results/Theta_Rhythem.png']);

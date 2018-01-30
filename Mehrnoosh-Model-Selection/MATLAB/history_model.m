@@ -10,13 +10,20 @@ lin_pos = load('Data/linear_position.mat');
 spike = load('Data/spike.mat');
 direction = load('Data/direction.mat');
 time = load('Data/time.mat');
+
 time = time.struct.time;
 lin_pos = lin_pos.struct.linear_distance;
+lin_pos = lin_pos';
 direction = direction.struct.head_direction;
+direction = direction';
 spike = spike.struct.is_spike;
 
+lin_pos(isnan(lin_pos))=0;
+direction(isnan(direction))=0;
+spike = double(spike');
 
 %% Emperical Model
+
 N = length(spike);
 bins = min(lin_pos):10:max(lin_pos);
 spikeidx = find(spike==1);
@@ -42,7 +49,7 @@ one = ones(length(Hist),1);
 X = [one Hist];
 lambda = exp(X*b);
 
-%% GLM (Spline)
+%% GLM (Spline) for History Component 
 
 c_pt = [-10 0 20 40 60 80 100 120 140 160 180 200 210];
 num_c_pts = length(c_pt);
@@ -65,54 +72,21 @@ one = ones(length(y),1);
 X_spl_hist = [one X_hist_spl];
 lambda_spl = exp(X_spl_hist*b_spl);
 
-%% KS plot
+%% Visualization of spline basis functions for history
 
-% Indicator
 figure;
-KS =  KSplot(lambda,y);
-title('KS Plot for Indicator function')
-xlabel('Model CDF')
-ylabel('Emperical CDF')
-
-% Gaussian RBF
-%figure;
-% subplot(2,1,1)
-% KS =  KSplot(lambda_rbf,y);
-% title('KS Plot for Gaussian RBF')
-% xlabel('Model CDF')
-% ylabel('Emperical CDF')
-
-% Cardinal Spline 
-figure;
-%subplot(2,1,2)
-KS_spl =  KSplot(lambda_spl,y);
-title('KS Plot for Cardinal Spline,lag=200')
-xlabel('Model CDF')
-ylabel('Emperical CDF')
-
-%% Cumulative Residual Analysis
-
-R_ind = cumsum(stats.resid); 
-R_spl = cumsum(stats_spl.resid);
-R_rbf = cumsum(stats_rbf.resid);
-figure;
-plot(time(lag+1:end),R_ind)
-hold on
-plot(time(lag+1:end),R_spl)
-hold on
-plot(time(lag+1:end),R_rbf)
-title('Residual for History-dependent model')
-xlabel('Time')
-ylabel('Residual')
-legend('Indicator','Cardinal Spline','Gaussian RBF')
+plot(1:lag,exp(X_spl*b_spl(2:end)))
+xlabel('Lags')
+title('Spline basis function for history')
 grid
+saveas(gcf,[pwd '/Results/Spline_module_history.fig']);
+saveas(gcf,[pwd '/Results/Spline_module_history.png']);
 
 
-%% Models
+%% GLM model based on lin_pos and history component
 
-% GLM (Spline)
-
-c_pt_pos = [-210,-190,-150,-140,-120,-100,-90,-50,-20,0,20,40,60,80,120,150,200,220];
+% GLM (Spline) for lin_pos
+c_pt_pos = [-20,-10,0,10,15,20,30,50,60,70,80,90,100,110,130,140,150,170,190,200];
 num_c_pts = length(c_pt_pos);
 s = 0.4; 
 spline = zeros(length(lin_pos),length(c_pt_pos));
@@ -132,36 +106,36 @@ design_matrix_hist = [spline(lag+1:end,:) X_hist_spl];
 [yhat_pos,ylo_pos,yhi_pos] = glmval(b_spl_pos,design_matrix_hist,'log',stat_spl_pos);
 lambda_spl_pos = yhat_pos;
 
-% desgn_hist_ind = [spline(lag+1:end,:) Hist];
-% [b_hist_pos,dev_hist_pos,stat_hist_pos] = glmfit(desgn_hist_ind, y,'poisson');
-% [yhat_pos,ylo_pos,yhi_pos] = glmval(b_hist_pos,desgn_hist_ind,'log',stat_hist_pos);
-% lambda_hist_pos = yhat_pos;
+%% Visualization for HistoryModel
+
+figure;
+plot(time,spike,time(lag+1:end),lambda_spl_pos);
+title('Spline basis function for HistoryModel')
+xlabel('Lag')
+grid
+saveas(gcf,[pwd '/Results/Spline_module_HistoryModel.fig']);
+saveas(gcf,[pwd '/Results/Spline_module_HistoryModel.png']);
+
 %% KS plot
 
 % Cardinal Spline 
 figure;
 subplot(2,1,1)
 KS_spl =  KSplot(lambda_spl,y);
-title('KS Plot for spline function on history component,lag=100')
+title('KS Plot for spline function on history component')
 xlabel('Model CDF')
 ylabel('Emperical CDF')
 
 subplot(2,1,2)
 %figure;
 KS_spl =  KSplot(lambda_spl_pos,y);
-title('KS Plot for History dependent mdoel,lag=100')
+title('KS Plot for History dependent mdoel')
 xlabel('Model CDF')
 ylabel('Emperical CDF')
 
+saveas(gcf,[pwd '/Results/KS_Plot_HistoryModel.fig']);
+saveas(gcf,[pwd '/Results/KS_Plot_HistoryModel.png']);
 
-%% 
-figure;
-
-x = exp(b_spl);
-plot(x)
-
-figure;
-plot(time,spike,time(lag+1:end),lambda_spl_pos);
 %% Direction
 
 direction(direction>=0)=1;
