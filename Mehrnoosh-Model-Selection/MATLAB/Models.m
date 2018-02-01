@@ -7,9 +7,9 @@ clc
 
 %% Load data 
 
-lin_pos = load('Data/linear_position.mat');
-spike = load('Data/spike.mat');
-time = load('Data/time.mat');
+lin_pos = load('Data/Tetrode5,Neuron2/linear_position.mat');
+spike = load('Data/Tetrode5,Neuron2/spike.mat');
+time = load('Data/Tetrode5,Neuron2/time.mat');
 time = time.struct.time;
 lin_pos = lin_pos.struct.linear_distance;
 lin_pos = lin_pos';
@@ -116,8 +116,8 @@ xlabel('linear Position[cm]')
 ylabel('Firing Rate[spike/ms]')
 title('Cardinal Spline GLM')
 
-saveas(gcf,[pwd '/Results/Firing_Rate_4models.fig']);
-saveas(gcf,[pwd '/Results/Firing_Rate_4models.png']);
+saveas(gcf,[pwd '/Results/T5,N2/Firing_Rate_4models.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/Firing_Rate_4models.png']);
 %% KS plot 
 
 % Linear Regreesion 
@@ -149,8 +149,8 @@ KS_spl =  KSplot(lambda_spl,spike);
 title('KS Plot for Cardinal Spline')
 xlabel('Model CDF')
 ylabel('Emperical CDF')
-saveas(gcf,[pwd '/Results/KS_Plot_4models.fig']);
-saveas(gcf,[pwd '/Results/KS_Plot_4models.png']);
+saveas(gcf,[pwd '/Results/T5,N2/KS_Plot_4models.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/KS_Plot_4models.png']);
 
 %% AIC model
 
@@ -200,5 +200,5 @@ xlabel('Time')
 ylabel('Residual')
 legend('Linear','Quadratic','Gaussian RBF','Cardinal Spline')
 grid
-saveas(gcf,[pwd '/Results/Residual_Analysis.png']);
-saveas(gcf,[pwd '/Results/Residual_Analysis.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/Residual_Analysis.png']);
+saveas(gcf,[pwd '/Results/T5,N2/Residual_Analysis.fig']);

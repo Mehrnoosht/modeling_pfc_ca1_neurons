@@ -11,39 +11,34 @@ import numpy as np
 import pandas as pd
 import scipy.signal as scis
 
-from src.data_processing import (get_interpolated_position_dataframe,
-                                 get_LFP_dataframe,
-                                 get_spike_indicator_dataframe,
-                                 make_epochs_dataframe, make_neuron_dataframe,
-                                 make_tetrode_dataframe)
-from src.parameters import ANIMALS, N_DAYS
+from loren_frank_data_processing import (get_interpolated_position_dataframe,
+                                         get_LFP_dataframe,
+                                         get_spike_indicator_dataframe,
+                                         make_epochs_dataframe,
+                                         make_neuron_dataframe,
+                                         make_tetrode_dataframe)
+from src.parameters import ANIMALS
 
-days = range(1, N_DAYS + 1)
-epoch_info = make_epochs_dataframe(ANIMALS, days)
-tetrode_info = make_tetrode_dataframe(ANIMALS)
+epoch_info = make_epochs_dataframe(ANIMALS)
 
 epoch_key = ('HPa', 6, 2)
-tetrode_key = ('HPa', 6, 2, 5)
-neuron_info = make_neuron_dataframe(ANIMALS)
-neuron_key = ('HPa', 6, 2, 5, 2)
+tetrode_info = make_tetrode_dataframe(ANIMALS).xs(epoch_key, drop_level=False)
+tetrode_key = ('HPa', 6, 2, 1)
+
+neuron_info = make_neuron_dataframe(ANIMALS).xs(epoch_key, drop_level=False)
+neuron_key = ('HPa', 6, 2, 1, 5)
+
 
 spike = get_spike_indicator_dataframe(neuron_key, ANIMALS)
-linear_position = get_interpolated_position_dataframe(epoch_key, ANIMALS)[
-    'linear_position']
-x_pos = get_interpolated_position_dataframe(epoch_key, ANIMALS)['x_position']
-y_pos = get_interpolated_position_dataframe(epoch_key, ANIMALS)['y_position']
-speed = get_interpolated_position_dataframe(epoch_key, ANIMALS)['speed']
-head_direction = get_interpolated_position_dataframe(epoch_key, ANIMALS)[
-    'head_direction']
-
-spike_position = spike.assign(
-    linear_pos=linear_position, x_position=x_pos,
-    y_position=y_pos, speed=speed, head_direction=head_direction)
-spike_pos = spike_position[spike['is_spike'] == 1]
-
-
+position_info = get_interpolated_position_dataframe(epoch_key, ANIMALS)
+linear_distance = position_info['linear_distance']
+x_pos = position_info['x_position']
+y_pos = position_info['y_position']
+speed = position_info['speed']
+head_direction = position_info['head_direction']
 eeg = get_LFP_dataframe(tetrode_key, ANIMALS)
-eeg.to_csv('eeg.csv', sep=',')
+
+spike = spike.to_frame('is_spike')
 
 # Visualizing Spike Time
 
@@ -597,9 +592,9 @@ plt.figure(20)
 x_acrr = np.arange(-903771, 903770)
 plt.scatter(x_acrr, acor)
 # plt.stem(acor)
-# plt.xlim(-100,100)
+#plt.xlim(-500,500)
 plt.ylabel('Autocorrelation')
-plt.title('Tetrode:5  Neuron:2')
+plt.title('Tetrode:4  Neuron:4')
 
 #plt.axhline(y=y, color='r', linestyle='-')
 #plt.axhline(y=-y, color='r', linestyle='-')

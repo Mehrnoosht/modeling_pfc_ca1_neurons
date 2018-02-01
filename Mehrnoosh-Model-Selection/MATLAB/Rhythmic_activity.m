@@ -4,13 +4,10 @@ close all
 clc
 %% Loading data
 % 
-lfp = load('Data/eeg.mat');
-timee = load('Data/time.mat');
+lfp = load('Data/Tetrode5,Neuron2/eeg.mat');
+timee = load('Data/Tetrode5,Neuron2/time.mat');
 lfp = lfp.struct.electric_potential;
 timee = timee.struct.time;
-% eeg = csvread('Data/eeg.csv');
-% timee = eeg(:,1);
-% lfp = eeg(:,2);
 
 
 %% Autocovariance
@@ -24,8 +21,8 @@ figure;
 plot(lag*dt,ac);
 xlabel('Lag')
 ylabel('Autocovariance')
-saveas(gcf,[pwd '/Results/Autocovariance.fig']);
-saveas(gcf,[pwd '/Results/Autocovariance.png']);
+saveas(gcf,[pwd '/Results/T5,N2/Autocovariance.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/Autocovariance.png']);
 %% Spectrum Analysis
 
 ft = fft(lfp-mean(lfp));
@@ -62,8 +59,8 @@ xlabel('Freq.[Hz]')
 ylabel('Power [dB]')
 title('Power Spectrum of EEG signal')
 
-saveas(gcf,[pwd '/Results/EEG_Signal.fig']);
-saveas(gcf,[pwd '/Results/EEG_signal.png']);
+saveas(gcf,[pwd '/Results/T5,N2/EEG_Signal.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/EEG_signal.png']);
 %% Spectrogram
 
 sampling_freq = 1/dt;
@@ -80,8 +77,8 @@ axis xy;
 xlabel('Time[s]');
 ylabel('Freq.[HZ]');
 title('Spectrogram of EEG signal')
-saveas(gcf,[pwd '/Results/Spectogram.fig']);
-saveas(gcf,[pwd '/Results/Spectogram.png']);
+saveas(gcf,[pwd '/Results/T5,N2/Spectogram.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/Spectogram.png']);
 %% Filtered EEG
 
 n=1000; %Filter order
@@ -111,11 +108,11 @@ ylabel('Power [dB]')
 title('Power Spectrum of low-pass filtered EEG signal')
 alpha(0.5)
 
-saveas(gcf,[pwd '/Results/Lowpass_filter_EEG.fig']);
-saveas(gcf,[pwd '/Results/Lowpass_filter_EEG.png']);
+saveas(gcf,[pwd '/Results/T5,N2/Lowpass_filter_EEG.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/Lowpass_filter_EEG.png']);
 %% Theta Rhythm
 
-Wn_th = [5, 8]/fnq;
+Wn_th = [4, 10]/fnq;
 n_th = 1000;
 b_th = fir1(n_th,Wn_th);
 lfp_lo_th = filtfilt(b_th,1,lfp);
@@ -130,6 +127,10 @@ f = (0:df:fnq);
 analytic_signal = hilbert(lfp_lo_th);
 phi = angle(analytic_signal);
 amp = abs(analytic_signal);
+
+save('phi')
+save('amp')
+save('lfp_lo_th')
 
 figure;
 subplot(2,2,1)
@@ -158,5 +159,8 @@ envelope(amp,10000,'peak')
 xlabel('Time')
 ylabel('Theta Amplitute')
 
-saveas(gcf,[pwd '/Results/Theta_Rhythem.fig']);
-saveas(gcf,[pwd '/Results/Theta_Rhythem.png']);
+saveas(gcf,[pwd '/Results/T5,N2/Theta_Rhythem.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/Theta_Rhythem.png']);
+
+figure;
+plot(lin_pos(2:end),diff(lin_pos),'.')

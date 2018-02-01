@@ -20,10 +20,10 @@ epoch_info = make_epochs_dataframe(ANIMALS)
 
 epoch_key = ('HPa', 6, 2)
 tetrode_info = make_tetrode_dataframe(ANIMALS).xs(epoch_key, drop_level=False)
-tetrode_key = ('HPa', 6, 2, 5)
+tetrode_key = ('HPa', 6, 2, 1)
 
 neuron_info = make_neuron_dataframe(ANIMALS).xs(epoch_key, drop_level=False)
-neuron_key = ('HPa', 6, 2, 5, 2)
+neuron_key = ('HPa', 6, 2, 1, 5)
 
 spike = get_spike_indicator_dataframe(neuron_key, ANIMALS)
 position_info = get_interpolated_position_dataframe(epoch_key, ANIMALS)
@@ -44,16 +44,13 @@ eeg = pd.DataFrame(eeg)
 eeg_dict = {col_name: eeg[col_name].values for col_name in eeg.columns.values}
 scipy.io.savemat('eeg.mat', {'struct': eeg_dict})
 
-spike = pd.DataFrame(spike)
+spike = spike.to_frame('is_spike')
 spike_dict = {
     col_name: spike[col_name].values for col_name in spike.columns.values}
 scipy.io.savemat('spike.mat', {'struct': spike_dict})
 
 time = spike.index.total_seconds()
 time = pd.DataFrame(time)
-#timee['time'] = timee['time'].map(lambda x: str(x)[7:])
-#x = time.strptime('00:04:23'.split(',')[0],'%H:%M:%S')
-
 time_dict = {
     col_name: time[col_name].values for col_name in time.columns.values}
 scipy.io.savemat('time.mat', {'struct': time_dict})

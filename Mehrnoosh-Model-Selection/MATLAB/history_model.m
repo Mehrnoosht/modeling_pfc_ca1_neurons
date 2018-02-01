@@ -6,10 +6,13 @@ clc
 
 %% Load data 
 
-lin_pos = load('Data/linear_position.mat');
-spike = load('Data/spike.mat');
-direction = load('Data/direction.mat');
-time = load('Data/time.mat');
+lin_pos = load('Data/Tetrode5,Neuron2/linear_position.mat');
+spike = load('Data/Tetrode5,Neuron2/spike.mat');
+direction = load('Data/Tetrode5,Neuron2/direction.mat');
+time = load('Data/Tetrode5,Neuron2/time.mat');
+phi = load('Data/Tetrode5,Neuron2/phi.mat');
+amp = load('Data/Tetrode5,Neuron2/amp.mat');
+lfp = load('Data/Tetrode5,Neuron2/lfp_lo_th/.mat');
 
 time = time.struct.time;
 lin_pos = lin_pos.struct.linear_distance;
@@ -17,10 +20,15 @@ lin_pos = lin_pos';
 direction = direction.struct.head_direction;
 direction = direction';
 spike = spike.struct.is_spike;
+spike = spike';
+amp = amp.amp;
+amp = amp';
+phi = phi.phi;
+phi = phi';
 
 lin_pos(isnan(lin_pos))=0;
 direction(isnan(direction))=0;
-spike = double(spike');
+spike = double(spike);
 
 %% Emperical Model
 
@@ -79,8 +87,8 @@ plot(1:lag,exp(X_spl*b_spl(2:end)))
 xlabel('Lags')
 title('Spline basis function for history')
 grid
-saveas(gcf,[pwd '/Results/Spline_module_history.fig']);
-saveas(gcf,[pwd '/Results/Spline_module_history.png']);
+saveas(gcf,[pwd '/Results/T5,N2/Spline_module_history.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/Spline_module_history.png']);
 
 
 %% GLM model based on lin_pos and history component
@@ -113,8 +121,8 @@ plot(time,spike,time(lag+1:end),lambda_spl_pos);
 title('Spline basis function for HistoryModel')
 xlabel('Lag')
 grid
-saveas(gcf,[pwd '/Results/Spline_module_HistoryModel.fig']);
-saveas(gcf,[pwd '/Results/Spline_module_HistoryModel.png']);
+saveas(gcf,[pwd '/Results/T5,N2/Spline_module_HistoryModel.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/Spline_module_HistoryModel.png']);
 
 %% KS plot
 
@@ -133,18 +141,79 @@ title('KS Plot for History dependent mdoel')
 xlabel('Model CDF')
 ylabel('Emperical CDF')
 
-saveas(gcf,[pwd '/Results/KS_Plot_HistoryModel.fig']);
-saveas(gcf,[pwd '/Results/KS_Plot_HistoryModel.png']);
+saveas(gcf,[pwd '/Results/T5,N2/KS_Plot_HistoryModel.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/KS_Plot_HistoryModel.png']);
+
+
+%% Theta Rhythem
+
+% Visualization
+phii = phi(spike==1);
+figure; 
+scatter(lin_pos(spike==1),phii);
+figure;
+scatter3(lin_pos,phi,spike);
+
+bins_phi = min(phi):0.5:max(phi);
+count_phi = hist(phi(spikeidx),bins_phi);
+occupancy_phi = hist(phi,bins_phi);
+rate_phi = count_phi./occupancy_phi;
+figure;
+bar(bins_phi,rate_phi);
+
+
+% Spline basis function for theta phase
+c_pt_phi = min(phi)-1:0.5:max(phi)+2.5;
+num_c_pts_phi = length(c_pt_phi);
+s = 0.4; 
+spline_phi = zeros(length(phi),length(c_pt_phi));
+tic
+for i=1:length(phi)
+    nearest_c_pt_index = max(find(c_pt_phi<phi(i)));
+    nearest_c_pt_time = c_pt_phi(nearest_c_pt_index);
+    next_c_pt_time = c_pt_phi(nearest_c_pt_index+1);
+    u = (phi(i)-nearest_c_pt_time)./(next_c_pt_time-nearest_c_pt_time);
+    p=[u^3 u^2 u 1]*[-s 2-s s-2 s;2*s s-3 3-2*s -s;-s 0 s 0;0 1 0 0];
+    spline_phi(i,:) = [zeros(1,nearest_c_pt_index-2) p zeros(1,num_c_pts-4-(nearest_c_pt_index-2))];
+end
+toc
+
+design_matrix_hist_phi = [design_matrix_hist spline_phi(lag+1:end,:)];
+[b_spl_phi,dev_spl_phi,stat_spl_phi] = glmfit(design_matrix_hist_phi, y,'poisson');
+[yhat_phi,ylo_phi,yhi_phi] = glmval(b_spl_phi,design_matrix_hist_phi,'log',stat_spl_phi);
+lambda_spl_phi = yhat_phi;
+
+fprintf('Difference in Dev %f',dev_spl_pos-dev_spl_phi)
+
+figure;
+subplot(2,1,1)
+KS_spl =  KSplot(lambda_spl_pos,y);
+title('KS Plot for History dependent mdoel')
+xlabel('Model CDF')
+ylabel('Emperical CDF')
+
+subplot(2,1,2)
+KS_spl =  KSplot(lambda_spl_phi,y);
+title('KS Plot for History dependent mdoel with ThetaPhase')
+xlabel('Model CDF')
+ylabel('Emperical CDF')
+
+saveas(gcf,[pwd '/Results/T5,N2/KS_Plot_ThetaPhase.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/KS_Plot_ThetaPhase.png']);
+
 
 %% Direction
 
 direction(direction>=0)=1;
 direction(direction<0)=0;
 
+% Idicator function for Direction
 design_matrix_pdh = [design_matrix_hist direction(lag+1:end,:)];
 [b_spl_dir,dev_spl_dir,stat_spl_dir] = glmfit(design_matrix_pdh, y,'poisson');
 [yhat_dir,ylo_dir,yhi_dir] = glmval(b_spl_dir,design_matrix_pdh,'log',stat_spl_dir);
 lambda_spl_dir = yhat_dir;
+
+fprintf('Difference in Dev %f',dev_spl_pos-dev_spl_dir)
 
 figure;
 subplot(2,1,1)
@@ -158,6 +227,14 @@ KS_spl =  KSplot(lambda_spl_pos,y);
 title('KS Plot for History dependent mdoel with direction')
 xlabel('Model CDF')
 ylabel('Emperical CDF')
+
+saveas(gcf,[pwd '/Results/T5,N2/KS_Plot_Direction.fig']);
+saveas(gcf,[pwd '/Results/T5,N2/KS_Plot_Direction.png']);
+
+%==============================================================
+
+
+
 
 %% 
  1-chi2cdf(dev_spl-dev_spl_pos,num_c_pts);
