@@ -128,9 +128,9 @@ analytic_signal = hilbert(lfp_lo_th);
 phi = angle(analytic_signal);
 amp = abs(analytic_signal);
 
-save('phi')
-save('amp')
-save('lfp_lo_th')
+% save('phi')
+% save('amp')
+% save('lfp_lo_th')
 
 figure;
 subplot(2,2,1)
@@ -162,5 +162,3 @@ ylabel('Theta Amplitute')
 saveas(gcf,[pwd '/Results/T5,N2/Theta_Rhythem.fig']);
 saveas(gcf,[pwd '/Results/T5,N2/Theta_Rhythem.png']);
 
-figure;
-plot(lin_pos(2:end),diff(lin_pos),'.')
