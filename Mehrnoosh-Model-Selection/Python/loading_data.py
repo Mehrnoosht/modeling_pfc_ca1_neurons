@@ -40,6 +40,10 @@ pos_dict = {
     for col_name in linear_distance.columns.values}
 scipy.io.savemat('linear_position.mat', {'struct': pos_dict})
 
+speed = pd.DataFrame(speed)
+speed_dict = {col_name: speed[col_name].values for col_name in speed.columns.values}
+scipy.io.savemat('speed.mat', {'struct': speed_dict})
+
 eeg = pd.DataFrame(eeg)
 eeg_dict = {col_name: eeg[col_name].values for col_name in eeg.columns.values}
 scipy.io.savemat('eeg.mat', {'struct': eeg_dict})
