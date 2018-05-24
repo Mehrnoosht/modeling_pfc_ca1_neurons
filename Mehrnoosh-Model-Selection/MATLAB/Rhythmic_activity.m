@@ -4,12 +4,10 @@ close all
 clc
 %% Loading data
 % 
-lfp = load('Data/Tetrode5,Neuron2/eeg.mat');
-timee = load('Data/Tetrode5,Neuron2/time.mat');
+lfp = load('Data/1-4-4-9/eeg.mat');
+timee = load('Data/1-4-4-9/time.mat');
 lfp = lfp.struct.electric_potential;
 timee = timee.struct.time;
-
-
 %% Autocovariance
 
 dt = 1/1500; %Sampling intrval
@@ -21,8 +19,7 @@ figure;
 plot(lag*dt,ac);
 xlabel('Lag')
 ylabel('Autocovariance')
-saveas(gcf,[pwd '/Results/T5,N2/Autocovariance.fig']);
-saveas(gcf,[pwd '/Results/T5,N2/Autocovariance.png']);
+saveas(gcf,[pwd '/Results/R-1-4-4-9/Autocovariance.png']);
 %% Spectrum Analysis
 
 ft = fft(lfp-mean(lfp));
@@ -35,32 +32,21 @@ f = (0:df:fnq);
 %% Visualization
 
 figure;
-subplot(2,2,1)
-plot(timee,lfp);
-xlabel('Time[ms]')
-ylabel('Voltage[V]')
-title('EEG signal')
+subplot(2,2,1);plot(timee,lfp);
+xlabel('Time[ms]');ylabel('Voltage[V]');title('EEG signal')
 
-subplot(2,2,2)
-plot(f,Sxx);
-xlabel('Freq.[Hz]')
-ylabel('Power [\muV^2/HZ]')
-title('Power Spectrum of EEG signal')
+subplot(2,2,2);plot(f,Sxx);
+xlabel('Freq.[Hz]');ylabel('Power [\muV^2/HZ]');title('Power Spectrum of EEG signal')
 
-subplot(2,2,3)
-plot(f,10*log10(Sxx/max(Sxx)));
-xlabel('Freq.[Hz]')
-ylabel('Power [dB]')
-title('Power Spectrum of EEG signal')
+subplot(2,2,3);plot(f,10*log10(Sxx/max(Sxx)));
+xlabel('Freq.[Hz]');ylabel('Power [dB]');title('Power Spectrum of EEG signal')
 
 subplot(2,2,4);
 semilogx(f,10*log10(Sxx/max(Sxx)));
-xlabel('Freq.[Hz]')
-ylabel('Power [dB]')
-title('Power Spectrum of EEG signal')
+xlabel('Freq.[Hz]');ylabel('Power [dB]');title('Power Spectrum of EEG signal')
 
-saveas(gcf,[pwd '/Results/T5,N2/EEG_Signal.fig']);
-saveas(gcf,[pwd '/Results/T5,N2/EEG_signal.png']);
+saveas(gcf,[pwd '/Results/R-1-4-4-9/EEG_Signal.fig']);
+saveas(gcf,[pwd '/Results/R-1-4-4-9/EEG_signal.png']);
 %% Spectrogram
 
 sampling_freq = 1/dt;
@@ -70,49 +56,14 @@ nfft = round(sampling_freq);
 [S,F,T,P] = spectrogram(lfp-mean(lfp),time_interval,overlap,nfft,sampling_freq);
 
 figure;
-imagesc(T,F,10*log10(P));
-colormap jet
-colorbar;
-axis xy;
-xlabel('Time[s]');
-ylabel('Freq.[HZ]');
-title('Spectrogram of EEG signal')
-saveas(gcf,[pwd '/Results/T5,N2/Spectogram.fig']);
-saveas(gcf,[pwd '/Results/T5,N2/Spectogram.png']);
-%% Filtered EEG
+imagesc(T,F,10*log10(P));colormap jet;colorbar;axis xy;
+xlabel('Time[s]');ylabel('Freq.[HZ]');title('Spectrogram of EEG signal')
 
-n=1000; %Filter order
-Wn = 17/fnq; %Bandpass
-%Building lowpass filter
-b = transpose(fir1(n,Wn,'low'));
-lfp_low = filtfilt(b,1,lfp);
-
-T = N*dt;
-ft_low = fft(lfp_low-mean(lfp_low));
-Sxx_low = (2*dt^2/T)*(ft_low.*conj(ft_low));
-Sxx_low = Sxx_low(1:length(lfp_low)/2+1);
-f = (0:df:fnq);
-
-figure;
-subplot(2,1,1)
-plot(timee,lfp,timee,lfp_low);
-xlabel('Time[ms]')
-ylabel('Voltage[V]')
-title('Low-pass filtered EEG signal')
-
-subplot(2,1,2);
-semilogx(f,10*log10(Sxx/max(Sxx)),f,10*log10(Sxx_low/max(Sxx_low)))
-xlim([0 20]);
-xlabel('Freq.[Hz]')
-ylabel('Power [dB]')
-title('Power Spectrum of low-pass filtered EEG signal')
-alpha(0.5)
-
-saveas(gcf,[pwd '/Results/T5,N2/Lowpass_filter_EEG.fig']);
-saveas(gcf,[pwd '/Results/T5,N2/Lowpass_filter_EEG.png']);
+saveas(gcf,[pwd '/Results/R-1-4-4-9/Spectrogram.fig']);
+saveas(gcf,[pwd '/Results/R-1-4-4-9/Spectrogram.png']);
 %% Theta Rhythm
 
-Wn_th = [4, 10]/fnq;
+Wn_th = [5, 9]/fnq;
 n_th = 1000;
 b_th = fir1(n_th,Wn_th);
 lfp_lo_th = filtfilt(b_th,1,lfp);
@@ -128,37 +79,23 @@ analytic_signal = hilbert(lfp_lo_th);
 phi = angle(analytic_signal);
 amp = abs(analytic_signal);
 
-% save('phi')
-% save('amp')
-% save('lfp_lo_th')
-
+%save('phi')
+%save('amp')
 figure;
-subplot(2,2,1)
-plot(timee,lfp);
-hold on
-plot(timee,lfp_lo_th);
-xlim([4400,4401])
-xlabel('Time[ms]')
-ylabel('Voltage[V]')
-title('Filtered EEG signal (5-8 HZ)')
+subplot(2,2,1);plot(timee,lfp);hold on;plot(timee,lfp_lo_th);
+xlabel('Time[ms]');ylabel('Voltage[V]')
+title('Filtered EEG signal (4-10 HZ)')
 
-subplot(2,2,2)
-plot(f,Sxx,f,Sxx_th)
-xlabel('Freq.[Hz]')
-ylabel('Power [\muV^2/HZ]')
+subplot(2,2,2);plot(f,Sxx,f,Sxx_th)
+xlabel('Freq.[Hz]');ylabel('Power [\muV^2/HZ]')
 title('Power Spectrum of filtered EEG signal')
 
-subplot(2,2,3)
-plot(timee,phi);
-xlim([4400,4401])
-xlabel('Time')
-ylabel('Theta Phase')
+subplot(2,2,3);plot(timee,phi);
+xlabel('Time');ylabel('Theta Phase')
 
-subplot(2,2,4);
-envelope(amp,10000,'peak')
-xlabel('Time')
-ylabel('Theta Amplitute')
+subplot(2,2,4);envelope(amp,10000,'peak');
+xlabel('Time');ylabel('Theta Amplitute')
 
-saveas(gcf,[pwd '/Results/T5,N2/Theta_Rhythem.fig']);
-saveas(gcf,[pwd '/Results/T5,N2/Theta_Rhythem.png']);
+saveas(gcf,[pwd '/Results/R-1-4-4-9/Theta_Rhythm.fig']);
+saveas(gcf,[pwd '/Results/R-1-4-4-9/Theta_Rhythm.png']);
 

@@ -23,10 +23,10 @@ epoch_info = make_epochs_dataframe(ANIMALS)
 
 epoch_key = ('HPa', 6, 2)
 tetrode_info = make_tetrode_dataframe(ANIMALS).xs(epoch_key, drop_level=False)
-tetrode_key = ('HPa', 6, 2, 1)
+tetrode_key = ('HPa', 6, 2, 5)
 
 neuron_info = make_neuron_dataframe(ANIMALS).xs(epoch_key, drop_level=False)
-neuron_key = ('HPa', 6, 2, 1, 5)
+neuron_key = ('HPa', 6,2,5,2)
 
 
 spike = get_spike_indicator_dataframe(neuron_key, ANIMALS)
@@ -39,6 +39,12 @@ head_direction = position_info['head_direction']
 eeg = get_LFP_dataframe(tetrode_key, ANIMALS)
 
 spike = spike.to_frame('is_spike')
+
+spike_position =  spike.assign(linear_pos = linear_distance, x_position = x_pos,y_position = y_pos,speed=speed,head_direction=head_direction)
+spike_pos = spike_position[spike['is_spike']==1]
+
+
+is_spike = spike[spike.values==1]
 
 # Visualizing Spike Time
 
@@ -111,7 +117,7 @@ plt.show()
 
 # Position
 
-spike_pos = spike_pos.assign(x_pos=x_pos)
+spike_pos = is_spike.assign(x_pos=x_pos)
 spike_pos = spike_pos.assign(y_pos=y_pos)
 
 plt.figure(5)
@@ -119,15 +125,19 @@ plt.scatter(spike_pos['x_pos'], spike_pos['y_pos'], color='red', alpha=0.5)
 plt.plot(x_pos, y_pos, alpha=0.5)
 plt.xlabel('x_position[cm]')
 plt.ylabel('y_position[cm]')
-plt.title('Tetrode:5  Neuron:2')
+plt.title('Tetrode:4  Neuron:4')
 
 plt.show()
 
 # Linear Position
+spike_pos = spike_pos.assign(linear_distance=linear_distance)
 
-lin_pos = linear_position.to_frame()
+ 
+lin_pos = linear_distance.to_frame()
+spike_lin = lin_pos[spike.values==1]
 plt.figure(6)
-plt.scatter(spike_pos.index, spike_pos['linear_pos'], color='red', alpha=0.5)
+spike_lin['linear_distance'].plot(style='.',color='red', alpha=0.5)
+plt.hold(True)
 plt.plot(lin_pos.index, lin_pos.values, alpha=0.5)
 plt.xlabel('Time[s]')
 plt.ylabel('Linear_position[cm]')
@@ -583,8 +593,8 @@ N = len(spike['is_spike'])
 #y = y[0:N/2]
 yunbiased = y - np.mean(y)
 ynorm = np.sum(y**2)
-#acor = np.correlate(yunbiased, yunbiased, "same")/ynorm
-acor = scis.correlate(yunbiased, yunbiased, "same")
+acor = np.correlate(yunbiased, yunbiased, "same")/ynorm
+#acor = scis.correlate(yunbiased, yunbiased, "same")
 
 #y = 2/(np.sqrt(N))
 #acor = acor[int(len(acor)/2):]
