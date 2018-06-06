@@ -18,12 +18,12 @@ from src.parameters import ANIMALS
 
 epoch_info = make_epochs_dataframe(ANIMALS)
 
-epoch_key = ('HPa', 6, 2)
+epoch_key = ('HPa', 3, 2)
 tetrode_info = make_tetrode_dataframe(ANIMALS).xs(epoch_key, drop_level=False)
-tetrode_key = ('HPa', 6, 2, 4)
+tetrode_key = ('HPa', 3, 2, 4)
 
 neuron_info = make_neuron_dataframe(ANIMALS).xs(epoch_key, drop_level=False)
-neuron_key = ('HPa', 6,2,4,4)
+neuron_key = ('HPa', 3,2,4,3)
 
 spike = get_spike_indicator_dataframe(neuron_key, ANIMALS)
 position_info = get_interpolated_position_dataframe(epoch_key, ANIMALS)

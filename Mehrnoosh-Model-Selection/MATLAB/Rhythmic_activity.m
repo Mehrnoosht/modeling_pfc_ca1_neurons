@@ -4,8 +4,8 @@ close all
 clc
 %% Loading data
 % 
-lfp = load('Data/1-4-4-9/eeg.mat');
-timee = load('Data/1-4-4-9/time.mat');
+lfp = load('Data/3-2-4-3/eeg.mat');
+timee = load('Data/3-2-4-3/time.mat');
 lfp = lfp.struct.electric_potential;
 timee = timee.struct.time;
 %% Autocovariance
@@ -19,7 +19,7 @@ figure;
 plot(lag*dt,ac);
 xlabel('Lag')
 ylabel('Autocovariance')
-saveas(gcf,[pwd '/Results/R-1-4-4-9/Autocovariance.png']);
+saveas(gcf,[pwd '/Results/R-3-2-4-3/Autocovariance.png']);
 %% Spectrum Analysis
 
 ft = fft(lfp-mean(lfp));
@@ -45,8 +45,8 @@ subplot(2,2,4);
 semilogx(f,10*log10(Sxx/max(Sxx)));
 xlabel('Freq.[Hz]');ylabel('Power [dB]');title('Power Spectrum of EEG signal')
 
-saveas(gcf,[pwd '/Results/R-1-4-4-9/EEG_Signal.fig']);
-saveas(gcf,[pwd '/Results/R-1-4-4-9/EEG_signal.png']);
+saveas(gcf,[pwd '/Results/R-3-2-4-3/EEG_Signal.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-4-3/EEG_signal.png']);
 %% Spectrogram
 
 sampling_freq = 1/dt;
@@ -59,8 +59,8 @@ figure;
 imagesc(T,F,10*log10(P));colormap jet;colorbar;axis xy;
 xlabel('Time[s]');ylabel('Freq.[HZ]');title('Spectrogram of EEG signal')
 
-saveas(gcf,[pwd '/Results/R-1-4-4-9/Spectrogram.fig']);
-saveas(gcf,[pwd '/Results/R-1-4-4-9/Spectrogram.png']);
+saveas(gcf,[pwd '/Results/3-2-4-3/Spectrogram.fig']);
+saveas(gcf,[pwd '/Results/3-2-4-3/Spectrogram.png']);
 %% Theta Rhythm
 
 Wn_th = [5, 9]/fnq;
@@ -79,8 +79,6 @@ analytic_signal = hilbert(lfp_lo_th);
 phi = angle(analytic_signal);
 amp = abs(analytic_signal);
 
-%save('phi')
-%save('amp')
 figure;
 subplot(2,2,1);plot(timee,lfp);hold on;plot(timee,lfp_lo_th);
 xlabel('Time[ms]');ylabel('Voltage[V]')
@@ -96,6 +94,6 @@ xlabel('Time');ylabel('Theta Phase')
 subplot(2,2,4);envelope(amp,10000,'peak');
 xlabel('Time');ylabel('Theta Amplitute')
 
-saveas(gcf,[pwd '/Results/R-1-4-4-9/Theta_Rhythm.fig']);
-saveas(gcf,[pwd '/Results/R-1-4-4-9/Theta_Rhythm.png']);
+saveas(gcf,[pwd '/Results/R-3-2-4-3/Theta_Rhythm.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-4-3/Theta_Rhythm.png']);
 
