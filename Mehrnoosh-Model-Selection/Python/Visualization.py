@@ -21,12 +21,12 @@ from src.parameters import ANIMALS
 
 epoch_info = make_epochs_dataframe(ANIMALS)
 
-epoch_key = ('HPa', 6, 2)
+epoch_key = ('HPa', 3, 2)
 tetrode_info = make_tetrode_dataframe(ANIMALS).xs(epoch_key, drop_level=False)
-tetrode_key = ('HPa', 6, 2, 5)
+tetrode_key = ('HPa', 3, 2, 4)
 
 neuron_info = make_neuron_dataframe(ANIMALS).xs(epoch_key, drop_level=False)
-neuron_key = ('HPa', 6,2,5,2)
+neuron_key = ('HPa', 3,2,4,3)
 
 
 spike = get_spike_indicator_dataframe(neuron_key, ANIMALS)
@@ -125,7 +125,7 @@ plt.scatter(spike_pos['x_pos'], spike_pos['y_pos'], color='red', alpha=0.5)
 plt.plot(x_pos, y_pos, alpha=0.5)
 plt.xlabel('x_position[cm]')
 plt.ylabel('y_position[cm]')
-plt.title('Tetrode:4  Neuron:4')
+
 
 plt.show()
 
