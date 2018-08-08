@@ -4,8 +4,8 @@ close all
 clc
 %% Loading data
 % 
-lfp = load('Data/3-2-4-3/eeg.mat');
-timee = load('Data/3-2-4-3/time.mat');
+lfp = load('Data/3-4-7-2/eeg.mat');
+timee = load('Data/3-4-7-2/time.mat');
 lfp = lfp.struct.electric_potential;
 timee = timee.struct.time;
 %% Autocovariance
@@ -19,7 +19,7 @@ figure;
 plot(lag*dt,ac);
 xlabel('Lag')
 ylabel('Autocovariance')
-saveas(gcf,[pwd '/Results/R-3-2-4-3/Autocovariance.png']);
+saveas(gcf,[pwd '/Results/R-3-4-7-2/Autocovariance.png']);
 %% Spectrum Analysis
 
 ft = fft(lfp-mean(lfp));
@@ -44,26 +44,27 @@ xlabel('Freq.[Hz]');ylabel('Power [dB]');title('Power Spectrum of EEG signal')
 subplot(2,2,4);
 semilogx(f,10*log10(Sxx/max(Sxx)));
 xlabel('Freq.[Hz]');ylabel('Power [dB]');title('Power Spectrum of EEG signal')
-
-saveas(gcf,[pwd '/Results/R-3-2-4-3/EEG_Signal.fig']);
-saveas(gcf,[pwd '/Results/R-3-2-4-3/EEG_signal.png']);
+% 
+% saveas(gcf,[pwd '/Results/R-3-4-7-2/EEG_Signal.fig']);
+saveas(gcf,[pwd '/Results/R-3-4-7-2/EEG_signal.png']);
 %% Spectrogram
+
 
 sampling_freq = 1/dt;
 time_interval = round(sampling_freq);
 overlap = round(0.95*sampling_freq);
 nfft = round(sampling_freq);
 [S,F,T,P] = spectrogram(lfp-mean(lfp),time_interval,overlap,nfft,sampling_freq);
-
-figure;
-imagesc(T,F,10*log10(P));colormap jet;colorbar;axis xy;
-xlabel('Time[s]');ylabel('Freq.[HZ]');title('Spectrogram of EEG signal')
-
-saveas(gcf,[pwd '/Results/3-2-4-3/Spectrogram.fig']);
-saveas(gcf,[pwd '/Results/3-2-4-3/Spectrogram.png']);
+% 
+% figure;
+% imagesc(T,F,10*log10(P));colormap jet;colorbar;axis xy;
+% xlabel('Time[s]');ylabel('Freq.[HZ]');title('Spectrogram of EEG signal')
+% 
+% saveas(gcf,[pwd '/Results/R-3-4-7-2/Spectrogram.fig']);
+% saveas(gcf,[pwd '/Results/R-3-4-7-2/Spectrogram.png']);
 %% Theta Rhythm
 
-Wn_th = [5, 9]/fnq;
+Wn_th = [4, 10]/fnq;
 n_th = 1000;
 b_th = fir1(n_th,Wn_th);
 lfp_lo_th = filtfilt(b_th,1,lfp);
@@ -94,6 +95,6 @@ xlabel('Time');ylabel('Theta Phase')
 subplot(2,2,4);envelope(amp,10000,'peak');
 xlabel('Time');ylabel('Theta Amplitute')
 
-saveas(gcf,[pwd '/Results/R-3-2-4-3/Theta_Rhythm.fig']);
-saveas(gcf,[pwd '/Results/R-3-2-4-3/Theta_Rhythm.png']);
+saveas(gcf,[pwd '/Results/R-3-4-7-2/Theta_Rhythm.fig']);
+% saveas(gcf,[pwd '/Results/R-3-4-7-2/Theta_Rhythm.png']);
 
