@@ -2,13 +2,13 @@
 
 %  Load data 
 
-lin_pos = load('Data/6-2-4-6/linear_position.mat');
-spike = load('Data/6-2-4-6/spike.mat');
-directionn = load('Data/6-2-4-6/direction.mat');
-speed = load('Data/6-2-4-6/speed.mat');
-time = load('Data/6-2-4-6/time.mat');
-% x_pos = load('Data/6-2-4-6/x_pos.mat');
-% y_pos = load('Data/6-2-4-6/y_pos.mat');
+lin_pos = load('Data/3-2-1-7/linear_position.mat');
+spike = load('Data/3-2-1-7/spike.mat');
+directionn = load('Data/3-2-1-7/direction.mat');
+speed = load('Data/3-2-1-7/speed.mat');
+time = load('Data/3-2-1-7/time.mat');
+% x_pos = load('Data/3-2-1-7/x_pos.mat');
+% y_pos = load('Data/3-2-1-7/y_pos.mat');
 
 time = time.struct.time;
 lin_pos = lin_pos.struct.linear_distance';
@@ -60,30 +60,35 @@ fprintf('Difference in Dev %f',dev_hist-dev_n)
 figure;
 plot(1:lag,exp(HistSpl*b_hist(2:end)))
 xlabel('Lags');title('Spline basis function for History');grid
-saveas(gcf,[pwd '/Results/R-6-2-4-6/Spline_Module_history.png']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/Spline_Module_history.png']);
 %% GLM (Linearized Position)
 
-c_pt_pos = [-2,-1,0,30,50,90,150,165,175,185,190,192];
+c_pt_pos = [-2,-1,0,50,110,140,170,190,192];
 num_c_pts = length(c_pt_pos);s = 0.4; 
 design_matrix_pos = CardinalSpline(lin_pos,c_pt_pos,num_c_pts,s);
 ran_pos = rank(design_matrix_pos)
 
 % Perfect Prediction
-[design_matrix_pos,pp_p,idx_pp_p] = PrfctPrd(design_matrix_pos,spike);
-
-% Dependecy between columns
+[design_matrix_pos_new,pp_p,idx_pp_p] = PrfctPrd(design_matrix_pos,spike);
+% 
+% % Dependecy between columns
 imagesc(design_matrix_pos);colorbar;
-design_matrix_pos(:,[1,11])=[];
-del_dev = [];
-for i=1:size(design_matrix_pos,2)
-    
-    [b_pos1,dev_pos1,stat_pos1] = glmfit(design_matrix_pos(speed>thsh,1:i), spike(speed>thsh),'poisson');
-     [b_pos2,dev_pos2,stat_pos2] = glmfit(design_matrix_pos(speed>thsh,1:i+1), spike(speed>thsh),'poisson');
-    del_dev = [del_dev dev_pos1-dev_pos2];
-end
+design_matrix_pos(:,[1,2,9])=[];
+% del_dev = [];
+% for i=1:size(design_matrix_pos,2)
+%     
+%     [b_pos1,dev_pos1,stat_pos1] = glmfit(design_matrix_pos(speed>thsh,1:i), spike(speed>thsh),'poisson');
+%      [b_pos2,dev_pos2,stat_pos2] = glmfit(design_matrix_pos(speed>thsh,1:i+1), spike(speed>thsh),'poisson');
+%     del_dev = [del_dev dev_pos1-dev_pos2];
+% end
 
-design_matrix_pos(:,[9])=[];
+% design_matrix_pos(:,[4,6])=[];
 % GLMFit
+[B_pos,fitinfo_pos] = lassoglm(design_matrix_pos(speed>thsh,:), spike(speed>thsh),'poisson','NumLambda',5);
+[dev_pos, idx_min] = min(fitinfo_pos.Deviance);
+b_pos = [fitinfo_pos.Intercept(:,idx_min) ;B_pos(:,idx_min)];
+yhat_pos = glmval(b_pos,design_matrix_pos(speed>thsh,:),'log');
+% OR
 [b_pos,dev_pos,stat_pos] = glmfit(design_matrix_pos(speed>thsh,:), spike(speed>thsh),'poisson');
 [yhat_pos,ylo_pos,yhi_pos] = glmval(b_pos,design_matrix_pos(speed>thsh,:),'log',stat_pos);
 fprintf('Difference in Dev %f',dev_n-dev_pos)
@@ -92,12 +97,12 @@ fprintf('Difference in Dev %f',dev_n-dev_pos)
 % figure;
 % plot(time(speed>thsh),spike(speed>thsh),time(speed>thsh),yhat_pos*1500,'.')
 % xlabel('time[S]');ylabel('Rate of Spiking[Spike/sec]')
-% saveas(gcf,[pwd '/Results/R-6-2-4-6/spl_module_Pos1.fig']);
+% saveas(gcf,[pwd '/Results/R-3-2-1-7/spl_module_Pos1.fig']);
 figure;
 plot(lin_pos(speed>thsh),spike(speed>thsh),lin_pos(speed>thsh),yhat_pos*1500,'.');
 xlabel('Lin-Pos[cm]');ylabel('Firing Rate[spike/sec]')
-% saveas(gcf,[pwd '/Results/R-6-2-4-6/Firing rate-pos-time.fig']);
-saveas(gcf,[pwd '/Results/R-6-2-4-6/spl_module_Pos2.png']);
+% saveas(gcf,[pwd '/Results/R-3-2-1-7/Firing rate-pos-time.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/spl_module_Pos2.png']);
 %% GLM (Position , Direction)
 
 direction = diff(lin_pos);
@@ -110,31 +115,24 @@ rank(design_matrix_posdir)
 [design_matrix_posdir_new,pp_pd,idx_pp_pd] = PrfctPrd(design_matrix_posdir,spikee);
 % Dependecy between columns
 imagesc(design_matrix_posdir_new);colorbar;
-del_dev_pd = [];
-for i=1:size(design_matrix_posdir_new,2)
-    
-    [b_posdir1,dev_posdir1,stat_posdir1] = glmfit(design_matrix_posdir_new(spd>thsh,1:i), spike(spd>thsh),'poisson');
-     [b_posdir2,dev_posdir2,stat_posdir2] = glmfit(design_matrix_posdir(spd>thsh,1:i+1), spike(spd>thsh),'poisson');
-    del_dev_pd = [del_dev_pd dev_posdir1-dev_posdir2];
-end
-design_matrix_posdir_new(:,[10])=[];
-
 %Misscaling
 a = vecnorm(design_matrix_posdir)./size(design_matrix_posdir,1);
 
 %GLMFit
+[B_posdir,fitinfo_posdir] = lassoglm(design_matrix_posdir(spd>thsh,:), spikee(spd>thsh),'poisson','NumLambda',5);
+[dev_posdir, idx_min] = min(fitinfo_posdir.Deviance);
+b_posdir = [fitinfo_posdir.Intercept(:,idx_min) ;B_posdir(:,idx_min)];
+yhat_posdir = glmval(b_posdir,design_matrix_posdir(spd>thsh,:),'log');
+%OR
 [b_posdir,dev_posdir,stat_posdir] = glmfit(design_matrix_posdir_new(spd>thsh,:), spikee(spd>thsh),'poisson');
-[yhat_posdir,ylo_posdir,yhi_posdir] = glmval(b_posdir,design_matrix_posdir_new(spd>thsh,:),'log',stat_posdir);
-yhat_posdir = yhat_posdir.*exp(-100*design_matrix_posdir(spd>thsh,idx_pp_pd));
-dev_posdir =-2*(nansum(log(poisspdf(spikee(spd>thsh),yhat_posdir)))- ...
-    nansum(log(poisspdf(spikee(spd>thsh),spikee(spd>thsh)))));
+[yhat_posdir,ylo_posdir,yhi_posdir] = glmval(b_posdir,design_matrix_posdir(spd>thsh,:),'log',stat_posdir);
 fprintf('Difference in Dev %f',dev_pos-dev_posdir)
 
 % figure;
 % plot(time(speedd>thsh),spikee(speedd>thsh),tiime(speedd>thsh),yhat_posdir*1500,'.')
 % xlabel('time[S]');ylabel('Rate of Spiking[Spike/sec]')
 % title('Firing Rate vs. GLM based on lin-pos and direction for V>thsh[cm/s]')
-% saveas(gcf,[pwd '/Results/R-6-2-4-6/spl_module_PosDir1.fig']);
+% saveas(gcf,[pwd '/Results/R-3-2-1-7/spl_module_PosDir1.fig']);
 figure;hold on 
 dir = direction(spd>thsh,:);
 plot(lin_pos(spd>thsh & direction(:,1)==1),spike(spd>thsh & direction(:,1)==1),...
@@ -143,8 +141,8 @@ plot(lin_pos(spd>thsh &  direction(:,1)==1),yhat_posdir(dir(:,1)==1)*1500,'.')
 plot(lin_pos(spd>thsh &  direction(:,2)==1),yhat_posdir(dir(:,2)==1)*1500,'.'); hold off
 xlabel('Lin-Pos[cm]');ylabel('Firing Rate[spike/sec]');
 legend('Spike-Inbound','Spike-Outbound','FiringRate-Inbound','FiringRate-Outbound')
-% saveas(gcf,[pwd '/Results/R-6-2-4-6/spl_module_PosDir2.fig']);
-saveas(gcf,[pwd '/Results/R-6-2-4-6/spl_module_PosDir2.png']);
+% saveas(gcf,[pwd '/Results/R-3-2-1-7/spl_module_PosDir2.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/spl_module_PosDir2.png']);
 %% GLM (Position , speed)
 
 design_matrix_posspd = [design_matrix_pos.*speed];
@@ -157,6 +155,11 @@ design_matrix_posspd = PrfctPrd(design_matrix_posspd,spike);
 imagesc(design_matrix_posspd);colorbar;
 
 % GLMFit
+[B_posspd,fitinfo_posspd] = lassoglm(design_matrix_posspd(speed>thsh,:), spike(speed>thsh),'poisson','NumLambda',5);
+[dev_posspd, idx_min] = min(fitinfo_posspd.Deviance);
+b_posspd = [fitinfo_posspd.Intercept(:,idx_min) ;B_posspd(:,idx_min)];
+yhat_posspd = glmval(b_posspd,design_matrix_posspd(speed>thsh,:),'log');
+%OR
 [b_posspd,dev_posspd,stat_posspd] = glmfit(design_matrix_posspd(speed>thsh,:), spike(speed>thsh),'poisson');
 [yhat_posspd,ylo_posspd,yhi_posspd] = glmval(b_posspd,design_matrix_posspd(speed>thsh,:),'log',stat_posspd);
 fprintf('Difference in Dev %f',dev_pos-dev_posspd)
@@ -186,18 +189,17 @@ end
 rank(design_matrix_posphi)
 
 % Perfect Prediction
-[design_matrix_posphi,pp_pp,idx_pp_pp] = PrfctPrd(design_matrix_posphi,spike);
+[design_matrix_posphi_new,pp_pp,idx_pp_pp] = PrfctPrd(design_matrix_posphi,spike);
 
 % Dependecy between columns
-imagesc(design_matrix_posphi);colorbar;
-del_dev_pp = [];
-for i=1:size(design_matrix_posphi,2)
-    [b_posphi1,dev_posphi1,stat_posphi1] = glmfit(design_matrix_posphi(speed>thsh,1:i), spike(speed>thsh),'poisson');
-     [b_posphi2,dev_posphi2,stat_posphi2] = glmfit(design_matrix_posphi(speed>thsh,1:i+1), spike(speed>thsh),'poisson');
-    del_dev_pp = [del_dev_pp dev_posphi1-dev_posphi2];
-end
+imagesc(design_matrix_posphi_new);colorbar;
 
 % GLMFit
+[B_posphi,fitinfo_posphi] = lassoglm(design_matrix_posphi(speed>thsh,:), spike(speed>thsh),'poisson','NumLambda',5);
+[dev_posphi, idx_min] = min(fitinfo_posphi.Deviance);
+b_posphi = [fitinfo_posphi.Intercept(:,idx_min) ;B_posphi(:,idx_min)];
+yhat_posphi = glmval(b_posphi,design_matrix_posphi(speed>thsh,:),'log');
+% OR
 [b_posphi,dev_posphi,stat_posphi] = glmfit(design_matrix_posphi(speed>thsh,:), spike(speed>thsh),'poisson');
 [yhat_posphi,ylo_posphi,yhi_posphi] = glmval(b_posphi,design_matrix_posphi(speed>thsh,:),'log',stat_posphi);
 fprintf('Difference in Dev %f',dev_pos-dev_posphi)
@@ -221,15 +223,15 @@ subplot(2,2,4);
 plot(lin_pos(speed>thsh & ind_phase(:,4)==1),spike(speed>thsh & ind_phase(:,4)==1),...
      lin_pos(speed>thsh & ind_phase(:,4)==1),yhat_posphi(ind_phi(:,4)==1)*1500,'.');  
 xlabel('Lin-Pos[cm]');ylabel('Firing Rate[spike/sec]')
-% saveas(gcf,[pwd '/Results/R-6-2-4-6/Firing rate-pos-time.fig']);
-saveas(gcf,[pwd '/Results/R-6-2-4-6/spl_module_PosPhi1.png']);
+% saveas(gcf,[pwd '/Results/R-3-2-1-7/Firing rate-pos-time.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/spl_module_PosPhi1.png']);
 figure;
 len = length(phi(spike==1 & speed>thsh));
 scatter3(lin_pos(spike==1 & speed>thsh),phi(spike==1 & speed>thsh),ones(len,1));hold on;
 plot3(lin_pos(speed>thsh),phi(speed>thsh),yhat_posphi*1500,'.');
 xlabel('Linear Position[cm]');ylabel('Firing rate [spike/sec]');
 legend('Spike','Friringn rate')
-saveas(gcf,[pwd '/Results/R-6-2-4-6/spl_module_PosPhi2.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/spl_module_PosPhi2.fig']);
 
 figure;
 len = length(phi(spike==1 & speed>thsh));
@@ -255,7 +257,7 @@ end
 lambda_phipos = 1500*exp(b_posphi(1).*One+sum(c,3));
 surf(Pos,Phai,lambda_phipos)
 xlabel('Linear Position[cm]');ylabel('Phase');zlabel('Firing rate [spike/sec]')
-saveas(gcf,[pwd '/Results/R-6-2-4-6/spl_module_PosPhi3.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/spl_module_PosPhi3.fig']);
 %% GLM (Position,Phase,Direction)
 
 design_matrix_posphidir = [design_matrix_posphi(2:end,:).*direction(:,1),design_matrix_posphi(2:end,:).*direction(:,2)];
@@ -268,18 +270,27 @@ rank(design_matrix_posphidir)
 imagesc(design_matrix_posphidir);colorbar;
 rank(design_matrix_posphidir_new)
 
-
-[b_posphidir,devf_posphidir,stat_posphidir] = glmfit(design_matrix_posphidir_new(spd>thsh,:), spikee(spd>thsh),'poisson');
-[yhat_posphidirn,ylo_posphidir,yhi_posphidir] = glmval(b_posphidir,design_matrix_posphidir_new(spd>thsh,:),'log',stat_posphidir);
-design_matrix_posphidir_n = [design_matrix_posphidir_new, design_matrix_posphidir(:,idx_pp_ppd)];
-b_posphidir_n = [b_posphidir',-1000*ones(1,length(idx_pp_ppd))]';
-yhat_posphidir = glmval(b_posphidir_n,design_matrix_posphidir_n(spd>thsh,:),'log');
-spkspd = spikee(spd>thsh);
-dev = zeros(length(yhat_posphidir),1);
-for i=1:length(yhat_posphidir)
-dev(i,:) =-2*((log(poisspdf(spkspd(i),yhat_posphidir(i)))));
-end
+%GLM Fit
+[B_posphidir,fitinfo_posphidir] = lassoglm(design_matrix_posphidir(spd>thsh,:), spikee(spd>thsh),'poisson','NumLambda',50);
+[dev_posphidir, idx_min] = min(fitinfo_posphidir.Deviance);
+b_posphidir = [fitinfo_posphidir.Intercept(:,idx_min) ;B_posphidir(:,idx_min)];
+yhat_posphidir = glmval(b_posphidir,design_matrix_posphidir(spd>thsh,:),'log');
+%OR
+[b_posphidir,dev_posphidir,stat_posphidir] = glmfit(design_matrix_posphidir_new(spd>thsh,:), spikee(spd>thsh),'poisson');
+[yhat_posphidir,ylo_posphidir,yhi_posphidir] = glmval(b_posphidir,design_matrix_posphidir_new(spd>thsh,:),'log',stat_posphidir);
+% design_matrix_posphidir_n = [design_matrix_posphidir_new, design_matrix_posphidir(:,idx_pp_ppd)];
+% b_posphidir_n = [b_posphidir',-100*ones(1,length(idx_pp_ppd))]';
+% yhat_posphidir = glmval(b_posphidir_n,design_matrix_posphidir_n(spd>thsh,:),'log');
+% spkspd = spikee(spd>thsh);
+% dev = zeros(length(yhat_posphidir),1);
+% for i=1:length(yhat_posphidir)
+% dev(i,:) =-2*((log(poisspdf(spkspd(i),yhat_posphidir(i)))));
+% end
+% dev_posphidir =-2*(sum(log(poisspdf(spikee(spd>thsh),yhat_posphidir)))- ...
+%     nansum(log(poisspdf(spikee(spd>thsh),spikee(spd>thsh)))));
 fprintf('Difference in Dev %f',dev_pos-dev_posphidir)
+
+
 %Misscaling
 a = vecnorm(design_matrix_posphidir)./size(design_matrix_posphidir,1);
 
@@ -310,8 +321,8 @@ plot(lin_pos(spd>thsh & ind_ph(:,4)==1 & direction(:,1)==1),spike(spd>thsh & ind
      lin_pos(spd>thsh & ind_ph(:,4)==1 & direction(:,1)==1),yhat_posphidir(ind_phi(:,4)==1 & dir(:,1)==1)*1500,'.');hold on 
 plot(lin_pos(spd>thsh & ind_ph(:,4)==1 & direction(:,2)==1),spike(spd>thsh & ind_ph(:,4)==1 & direction(:,2)==1),...
      lin_pos(spd>thsh & ind_ph(:,4)==1 & direction(:,2)==1),yhat_posphidir(ind_phi(:,4)==1 & dir(:,2)==1)*1500,'.') 
-saveas(gcf,[pwd '/Results/R-6-2-4-6/spl_module_PosPhiDir1.fig']);
-saveas(gcf,[pwd '/Results/R-6-2-4-6/spl_module_PosPhiDir1.png']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/spl_module_PosPhiDir1.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/spl_module_PosPhiDir1.png']);
 figure;
 len1 = length(phi(spikee==1 & spd>thsh & direction(:,1)==1));
 len2 = length(phi(spikee==1 & spd>thsh & direction(:,2)==1));
@@ -325,7 +336,7 @@ plot3(lin_pos(spd>thsh & direction(:,2)==1),phi(spd>thsh & direction(:,2)==1),..
       yhat_posphi(dir(:,2)==1)*1500,'.');
 xlabel('Linear Position[cm]');ylabel('Firing rate [spike/sec]');
 legend('Spk-Inb','Spk-Outb','FrRt-Inb','FrRt-Outb')
-saveas(gcf,[pwd '/Results/R-6-2-4-6/spl_module_PosPhiDir2.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/spl_module_PosPhiDir2.fig']);
 %% GLM (Position,Phase,Direction,Speed)
 
 design_matrix_posphidirspd = [design_matrix_posphidir.*spd];
@@ -333,22 +344,24 @@ rank(design_matrix_posphidirspd)
 
 % Perfect Prediction
 [design_matrix_posphidirspd_new,pp_ppds,idx_pp_ppds]  = PrfctPrd(design_matrix_posphidirspd,spikee);
-
 % Dependecy between columns
 imagesc(design_matrix_posphidirspd)
 rank(design_matrix_posphidirspd)
 
+%GLM FIt
+tic
+[B_posphidirspd,fitinfo_posphidirspd] = lassoglm(design_matrix_posphidirspd(spd>thsh,:), spikee(spd>thsh),'poisson','NumLambda',50);
+[dev_posphidirspd, idx_min] = min(fitinfo_posphidirspd.Deviance);
+b_posphidirspd = [fitinfo_posphidirspd.Intercept(:,idx_min) ;B_posphidirspd(:,idx_min)];
+yhat_posphidirspd = glmval(b_posphidirspd,design_matrix_posphidirspd(spd>thsh,:),'log');
+toc
+%OR
 [b_posphidirspd,dev_posphidirspd,stat_posphidirspd] = glmfit(design_matrix_posphidirspd_new(spd>thsh,:), spikee(spd>thsh),'poisson');
 [yhat_posphidirspd,ylo_posphidirspd,yhi_posphidirspd] = glmval(b_posphidirspd,design_matrix_posphidirspd(spd>thsh,:),'log',stat_posphidirspd);
-design_matrix_posphidirspd_n = [design_matrix_posphidirspd_new, design_matrix_posphidirspd(:,idx_pp_ppds)];
-b_posphidirspd_n = [b_posphidirspd',-10*ones(1,length(idx_pp_ppds))]';
-yhat_posphidirspd = glmval(b_posphidirspd_n,design_matrix_posphidirspd_n(spd>thsh,:),'log');
-dev_posphidirspd =-2*(nansum(log(poisspdf(spikee(spd>thsh),yhat_posphidirspd)))- ...
-    sum(log(poisspdf(spikee(spd>thsh),spikee(spd>thsh)))));
 %% GLM (Position,Phase,Direction,History)
 
 spdd = speed(lag+2:end);timm = time(lag+2:end);spk=spike(lag+2:end);
-design_matrix_full = [design_matrix_posphidir(lag+1:end,:),design_matrix_hist(2:end,:)];
+design_matrix_full = [design_matrix_posphidirspd(lag+1:end,:),design_matrix_hist(2:end,:)];
 rank(design_matrix_full)
 
 % Perfect Prediction
@@ -358,20 +371,26 @@ rank(design_matrix_full)
 imagesc(design_matrix_full)
 rank(design_matrix_full)
 
+%GLM Fit
+[B_full,fitinfo_full] = lassoglm(design_matrix_full(spdd>thsh,:), spk(spdd>thsh),'poisson','NumLambda',50);
+[dev_full, idx_min] = min(fitinfo_full.Deviance);
+b_full = [fitinfo_full.Intercept(:,idx_min) ;B_full(:,idx_min)];
+yhat_full = glmval(b_full,design_matrix_full(spdd>thsh,:),'log');
+%OR
 [b_full,dev_full,stat_full] = glmfit(design_matrix_full_new(spdd>thsh,:), spk(spdd>thsh),'poisson');
 [yhat_full,ylo_full,yhi_full] = glmval(b_full,design_matrix_full_new(spdd>thsh,:),'log',stat_full);
-design_matrix_full_n = [design_matrix_full_new, design_matrix_full(:,idx_pp_full)];
-b_full_n = [b_full',-100*ones(1,length(idx_pp_full))]';
-yhat_full = glmval(b_full_n,design_matrix_full_n(spdd>thsh,:),'log');
-dev_full =-2*(nansum(log(poisspdf(spikee(spdd>thsh),yhat_full)))- ...
-    sum(log(poisspdf(spikee(spdd>thsh),spikee(spdd>thsh)))));
-fprintf('Difference in Dev %f',dev_posphidir-dev_full)
+% design_matrix_full_n = [design_matrix_full_new, design_matrix_full(:,idx_pp_full)];
+% b_full_n = [b_full',-100*ones(1,length(idx_pp_full))]';
+% yhat_full = glmval(b_full_n,design_matrix_full_n(spdd>thsh,:),'log');
+% dev_full =-2*(nansum(log(poisspdf(spikee(spdd>thsh),yhat_full)))- ...
+%     sum(log(poisspdf(spikee(spdd>thsh),spikee(spdd>thsh)))));
+fprintf('Difference in Dev %f',dev_posphidirspd-dev_full)
 %% Non-Parametric Model 
 
 posspd = lin_pos(speed>thsh);phispd = phi(speed>thsh);
 posspdspk = lin_pos(speed>thsh & spike==1);phispdspk = spike(speed>thsh & spike==1);
-dataspk = [posspdspk,phispdspk];data = [posspd ,phispd'];
-mu = [posspd, phispd'];sigma = [5,0.5];
+dataspk = [posspdspk,phispdspk];data = [posspd ,phispd];
+mu = [posspd, phispd];sigma = [5,0.5];
 len_y = length(data);
 y_nprmt = zeros(len_y,1);
 for i=1:len_y 
@@ -380,16 +399,16 @@ for i=1:len_y
     y_nprmt(i) = num/den;  
 end
 
-dev_nprmt =-2*(sum(log(poisspdf(spike(speed>thsh),y_nprmt')))- ...
+dev_nprmt =-2*(sum(log(poisspdf(spike(speed>thsh),y_nprmt)))- ...
     nansum(log(poisspdf(spike(speed>thsh),spike(speed>thsh)))));
-AIC_nprmt = -2*(sum(log(poisspdf(spike(speed>thsh),y_nprmt'))))+2*length(y_nprmt')
+AIC_nprmt = -2*(sum(log(poisspdf(spike(speed>thsh),y_nprmt))))+2*length(y_nprmt')
 figure;
 len = length(phi(spike==1 & speed>thsh));
 scatter3(lin_pos(spike==1 & speed>thsh),phi(spike==1 & speed>thsh),ones(len,1));hold on;
 plot3(lin_pos(speed>thsh),phi(speed>thsh),y_nprmt*1500,'.');
 xlabel('Linear Position[cm]');ylabel('Firing rate [spike/sec]');
 legend('Spike','Friringn rate')
-saveas(gcf,[pwd '/Results/R-6-2-4-6/spl_module_Nonp_PosPhi1.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/spl_module_Nonp_PosPhi1.fig']);
 figure;
 subplot(2,1,1)
 KS_spl =  KSplot(y_nprmt,spike(speed>thsh));
@@ -399,17 +418,17 @@ subplot(2,1,2)
 KS_spl =  KSplot(yhat_posphi,spike(speed>thsh));
 title('KSPlot lin-pos,phase')
 xlabel('Model CDF');ylabel('Emperical CDF')
-saveas(gcf,[pwd '/Results/R-6-2-4-6/KS2.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/KS2.fig']);
 %% Deviance Analysis
 
 dev_hn = (dev_n-dev_hist)/dev_n
 devf_hn = (dev_n-dev_hist)/(dev_n-dev_full)
 dev_pn = (dev_n-dev_pos)/dev_n
 devf_pn = (dev_n-dev_pos)/(dev_n-dev_full)
-dev_pp = (dev_n-dev_posphi)/dev_n
-devf_pp = (dev_n-dev_posphi)/(dev_n-dev_full)
 dev_pd = (dev_n-dev_posdir)/dev_n
 devf_pd = (dev_n-dev_posdir)/(dev_n-dev_full)
+dev_pp = (dev_n-dev_posphi)/dev_n
+devf_pp = (dev_n-dev_posphi)/(dev_n-dev_full)
 dev_ps = (dev_n-dev_posspd)/dev_n
 devf_ps = (dev_n-dev_posspd)/(dev_n-dev_full)
 dev_nprmtn = (dev_n-dev_nprmt)/dev_n
@@ -419,8 +438,8 @@ dev_ppp = (dev_pos-dev_posphi)/dev_pos
 devf_ppp = (dev_pos-dev_posphi)/(dev_pos-dev_full)
 dev_ppid = (dev_posphi-dev_posphidir)/dev_posphi
 devf_ppid = (dev_posphi-dev_posphidir)/(dev_posphi-dev_full)
-% dev_ppids = (dev_posphidir-dev_posphidirspd)/dev_posphidir
-% devf_ppids = (dev_posphidir-dev_posphidirspd)/(dev_posphidir-dev_dev_full)
+dev_ppids = (dev_posphidir-dev_posphidirspd)/dev_posphidir
+devf_ppids = (dev_posphidir-dev_posphidirspd)/(dev_posphidir-dev_full)
 dev_full = (dev_posphidir-dev_full)/dev_posphidir
 %% AIC model
 
@@ -433,8 +452,8 @@ AIC_PP = -2*ll_PP+2*length(b_posphi);
 ll_PPD = sum(log(poisspdf(spikee(spd>thsh),yhat_posphidir)));
 AIC_PPD = -2*ll_PPD+2*length(b_posphi);
 
-% ll_PPDS = sum(log(poisspdf(spikee(spd>thsh),yhat_posphidirspd)));
-% AIC_PPDS = -2*ll_PPDS+2*length(b_posphidirspd);
+ll_PPDS = sum(log(poisspdf(spikee(spd>thsh),yhat_posphidirspd)));
+AIC_PPDS = -2*ll_PPDS+2*length(b_posphidirspd);
 
 ll_full= sum(log(poisspdf(spk(spdd>thsh),yhat_full)));
 AIC_full = -2*ll_full+2*length(b_full);
@@ -463,25 +482,28 @@ KS_spl =  KSplot(yhat_full,spk(spdd>thsh));
 title('lin-pos,dir,spd,hist')
 xlabel('Model CDF');ylabel('Emperical CDF');
 
-saveas(gcf,[pwd '/Results/R-6-2-4-6/KSPlot.png']);
-saveas(gcf,[pwd '/Results/R-6-2-4-6/KSPlot.fig']);       
+saveas(gcf,[pwd '/Results/R-3-2-1-7/KSPlot.png']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/KSPlot.fig']);       
 %% Residual
 
-R_P = cumsum(stat_pos.resid); 
-R_PP = cumsum(stat_posphi.resid);
-R_PPD = cumsum(stat_posphidir.resid);
-% R_PPDS = cumsum(stat_posphidirspd.resid);
-R_full = cumsum(stat_full.resid);
+res_pos = spike(speed>thsh)-yhat_pos;res_posphi = spike(speed>thsh)-yhat_posphi;
+res_posphidir = spikee(spd>thsh)-yhat_full;res_full = spk(spd>thsh)-yhat_full;
+res_posphidirspd = spikee(spd>thsh)-yhat_posphidirspd;
+R_P = cumsum(res_pos); 
+R_PP = cumsum(res_posphi);
+R_PPD = cumsum(res_posphidir);
+R_PPDS = cumsum(res_posphidirspd);
+R_full = cumsum(res_full);
 
 figure;hold on 
 times = time(2:end);
 plot(time(speed>thsh),R_P);plot(time(speed>thsh),R_PP);plot(times(spd>thsh),R_PPD);...
-% plot(times(spd>thsh),R_PPDS);
+plot(times(spd>thsh),R_PPDS);
 plot(timm(spdd>thsh),R_full)
 hold off
 title('Cumulative Residual');xlabel('Time');ylabel('Residual')
-% legend('P','PP','PPD','PPDS','PPDSH')
- legend('P','PP','PPD','PPDH')
+legend('P','PP','PPD','PPDS','PPDSH')
+%  legend('P','PP','PPD','PPDH')
 grid
-saveas(gcf,[pwd '/Results/R-6-2-4-6/Residual_Analysis.png']);
-% saveas(gcf,[pwd '/Results/R-6-2-4-6/Residual_Analysis.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/Residual_Analysis.png']);
+% saveas(gcf,[pwd '/Results/R-3-2-1-7/Residual_Analysis.fig']);

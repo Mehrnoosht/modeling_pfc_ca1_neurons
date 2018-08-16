@@ -3,12 +3,12 @@
 
 % Load data 
 
-lin_pos = load('Data/3-4-7-2/linear_position.mat');
-spike = load('Data/3-4-7-2/spike.mat');
-directionn = load('Data/3-4-7-2/direction.mat');
-speed = load('Data/3-4-7-2/speed.mat');
-time = load('Data/3-4-7-2/time.mat');
-% phi = load('Data/3-4-7-2/phi.mat');
+lin_pos = load('Data/3-2-1-7/linear_position.mat');
+spike = load('Data/3-2-1-7/spike.mat');
+directionn = load('Data/3-2-1-7/direction.mat');
+speed = load('Data/3-2-1-7/speed.mat');
+time = load('Data/3-2-1-7/time.mat');
+% phi = load('Data/3-2-1-7/phi.mat');
 
 time = time.struct.time;
 lin_pos = lin_pos.struct.linear_distance';
@@ -26,7 +26,7 @@ figure;
 scatter(lin_pos,speed);hold on
 scatter(lin_pos(spike==1),speed(spike==1),'.r');
 xlabel('lin-pos[cm]');ylabel('speed[cm/s]');
-saveas(gcf,[pwd '/Results/R-3-4-7-2/speed-linpos.png']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/speed-linpos.png']);
 %% Theta_linpos with direction
 
 direction = diff(lin_pos);
@@ -65,8 +65,8 @@ scatter(lin_pos(spike(2:endd)==1 & speed(2:endd)>=thsh & direction==1),...
 xlabel('lin-pos[cm]');ylabel('Theta Amplitude');legend('Inbound','Outbound')
 title('V>thsh[cm/s]')
 
-saveas(gcf,[pwd '/Results/R-3-4-7-2/Theta_linpos_dir.fig']);
-saveas(gcf,[pwd '/Results/R-3-4-7-2/Theta_linpos_dir.png']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/Theta_linpos_dir.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/Theta_linpos_dir.png']);
 %% Theta_speed with direction
 figure;
 subplot(2,2,1)
@@ -99,5 +99,5 @@ scatter(speed(spike(2:endd)==1 & speed(2:endd)>=thsh & direction==1),...
 xlabel('speed[cm/s]');ylabel('Theta Amplitude');legend('Inbound','Outbound')
 title('V>thsh[cm/s]')
 
-% saveas(gcf,[pwd '/Results/R-3-4-7-2/Theta_speed_dir.fig']);
-saveas(gcf,[pwd '/Results/R-3-4-7-2/Theta_speed_dir.png']);
+% saveas(gcf,[pwd '/Results/R-3-2-1-7/Theta_speed_dir.fig']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/Theta_speed_dir.png']);

@@ -4,9 +4,9 @@ close all
 clc
 %% Loading data
 % 
-lfp = load('Data/3-4-7-2/eeg.mat');
-timee = load('Data/3-4-7-2/time.mat');
-lfp = lfp.struct.electric_potential;
+lfp = load('Data/3-2-1-7/eeg.mat');
+timee = load('Data/3-2-1-7/time.mat');
+lfp = lfp.struct.HPa_03_02_001;
 timee = timee.struct.time;
 %% Autocovariance
 
@@ -19,7 +19,7 @@ figure;
 plot(lag*dt,ac);
 xlabel('Lag')
 ylabel('Autocovariance')
-saveas(gcf,[pwd '/Results/R-3-4-7-2/Autocovariance.png']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/Autocovariance.png']);
 %% Spectrum Analysis
 
 ft = fft(lfp-mean(lfp));
@@ -29,24 +29,6 @@ df = 1/max(T); %Frequancy resolution
 fnq = 1/dt/2; %Nyquist Freq. 
 f = (0:df:fnq);
 
-%% Visualization
-
-figure;
-subplot(2,2,1);plot(timee,lfp);
-xlabel('Time[ms]');ylabel('Voltage[V]');title('EEG signal')
-
-subplot(2,2,2);plot(f,Sxx);
-xlabel('Freq.[Hz]');ylabel('Power [\muV^2/HZ]');title('Power Spectrum of EEG signal')
-
-subplot(2,2,3);plot(f,10*log10(Sxx/max(Sxx)));
-xlabel('Freq.[Hz]');ylabel('Power [dB]');title('Power Spectrum of EEG signal')
-
-subplot(2,2,4);
-semilogx(f,10*log10(Sxx/max(Sxx)));
-xlabel('Freq.[Hz]');ylabel('Power [dB]');title('Power Spectrum of EEG signal')
-% 
-% saveas(gcf,[pwd '/Results/R-3-4-7-2/EEG_Signal.fig']);
-saveas(gcf,[pwd '/Results/R-3-4-7-2/EEG_signal.png']);
 %% Spectrogram
 
 
@@ -60,8 +42,8 @@ nfft = round(sampling_freq);
 % imagesc(T,F,10*log10(P));colormap jet;colorbar;axis xy;
 % xlabel('Time[s]');ylabel('Freq.[HZ]');title('Spectrogram of EEG signal')
 % 
-% saveas(gcf,[pwd '/Results/R-3-4-7-2/Spectrogram.fig']);
-% saveas(gcf,[pwd '/Results/R-3-4-7-2/Spectrogram.png']);
+% saveas(gcf,[pwd '/Results/R-3-2-1-7/Spectrogram.fig']);
+% saveas(gcf,[pwd '/Results/R-3-2-1-7/Spectrogram.png']);
 %% Theta Rhythm
 
 Wn_th = [4, 10]/fnq;
@@ -95,6 +77,6 @@ xlabel('Time');ylabel('Theta Phase')
 subplot(2,2,4);envelope(amp,10000,'peak');
 xlabel('Time');ylabel('Theta Amplitute')
 
-saveas(gcf,[pwd '/Results/R-3-4-7-2/Theta_Rhythm.fig']);
-% saveas(gcf,[pwd '/Results/R-3-4-7-2/Theta_Rhythm.png']);
+saveas(gcf,[pwd '/Results/R-3-2-1-7/Theta_Rhythm.fig']);
+% saveas(gcf,[pwd '/Results/R-3-2-1-7/Theta_Rhythm.png']);
 
