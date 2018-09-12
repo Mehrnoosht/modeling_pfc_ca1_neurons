@@ -17,8 +17,6 @@ spike = spike.struct.is_spike;
 
 lin_pos(isnan(lin_pos))=0;
 spike = double(spike');
-
-
 %% Emperical Model
 N = length(spike);
 bins = min(lin_pos):10:max(lin_pos);
@@ -32,7 +30,6 @@ design_matrix_reg = [];
 design_matrix_reg = [lin_pos];
 [b_reg,dev_reg,stats_reg] = glmfit(design_matrix_reg,spike,'poisson');
 lambda_reg = exp(b_reg(1)+b_reg(2)*design_matrix_reg);
-
 %% GLM (Quadratic)
 
 design_matrix_quad = [];
@@ -61,7 +58,6 @@ lambda_rbf = exp(X*b_rbf);
 
 %% GLM (Spline)
 
-%c_pt = [-210,-190,-150,-140,-120,-100,-90,-50,-20,0,20,40,60,80,120,150,200,220];
 c_pt = [-20,-10,0,10,15,20,30,50,60,70,80,90,100,110,130,140,150,170,190,200];
 num_c_pts = length(c_pt);
 s = 0.4; 
@@ -81,6 +77,9 @@ X_spl = X;
 [b_spl,dev_spl,stat_spl] = glmfit(X_spl, spike,'poisson','constant','off');
 [yhat,ylo,yhi] = glmval(b_spl,X_spl,'log',stat_spl,'constant','off');
 lambda_spl = yhat;
+
+figure;
+plot(time,spike,time,yhat*1500)
 %% Visualization
 
 figure;
